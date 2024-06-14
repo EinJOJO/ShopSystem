@@ -1,0 +1,2 @@
+prefix: "<gray>[<b><gradient:#FBAB7E:#F7CE68>ShopSystem</gradient></b>] <reset>"
+primary-style: "<b><gradient:#FBAB7E:#F7CE68>{0}</gradient></b>"
