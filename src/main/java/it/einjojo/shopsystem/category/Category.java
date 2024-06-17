@@ -4,31 +4,35 @@ import it.einjojo.shopsystem.item.ShopItem;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Category {
-    private final List<ShopItem> itemList;
+    private final String name;
+    private final List<ShopItem> items = new LinkedList<>();
     @Nullable
     private transient CategoryChangeObserver observer;
 
-    public Category(List<ShopItem> itemList) {
-        this.itemList = itemList;
+
+    public Category(String name, List<ShopItem> itemList) {
+        this.name = name;
+        this.items.addAll(itemList);
     }
 
     /**
      * @return Immutable list of items in this category
      */
-    public List<ShopItem> getItemList() {
-        return Collections.unmodifiableList(itemList);
+    public List<ShopItem> getItems() {
+        return Collections.unmodifiableList(items);
     }
 
     public void addItem(ShopItem item) {
-        itemList.add(item);
+        items.add(item);
         callChangeObserver();
     }
 
     public void removeItem(ShopItem item) {
-        itemList.remove(item);
+        items.remove(item);
         callChangeObserver();
     }
 
@@ -36,6 +40,10 @@ public class Category {
         if (observer != null) {
             observer.onCategoryChange(this);
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     public @Nullable CategoryChangeObserver getObserver() {

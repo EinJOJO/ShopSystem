@@ -41,7 +41,7 @@ tasks {
     processResources {
 
         filesMatching("plugin.yml") {
-            expand(mapOf("version" to project.version))
+            expand(mapOf("version" to version))
         }
 
 
