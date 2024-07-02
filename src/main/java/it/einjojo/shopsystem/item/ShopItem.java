@@ -1,6 +1,7 @@
 package it.einjojo.shopsystem.item;
 
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
+import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Item that can be bought and sold in a shop with conditions.
+ * Conditions are checked before the item can be bought or sold.
+ */
 public class ShopItem {
     @NotNull
     private final ItemTradeHandler itemTradeHandler;
@@ -145,5 +150,18 @@ public class ShopItem {
         if (conditionChecker == null) return;
         conditionCheckerList.remove(conditionChecker);
         callChangeObserver();
+    }
+
+    public @NotNull ItemTradeHandler getItemTradeHandler() {
+        return itemTradeHandler;
+    }
+
+
+    public @NotNull ItemStack getDisplayItemBase() {
+        return displayItemBase;
+    }
+
+    public @Nullable ShopItemObserver getObserver() {
+        return observer;
     }
 }

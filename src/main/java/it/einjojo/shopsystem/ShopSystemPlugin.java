@@ -5,7 +5,7 @@ import it.einjojo.shopsystem.category.Category;
 import it.einjojo.shopsystem.category.CategoryManager;
 import it.einjojo.shopsystem.command.ShopSystemCommand;
 import it.einjojo.shopsystem.config.ShopSystemPluginConfig;
-import it.einjojo.shopsystem.item.ItemStackTradeHandler;
+import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.ShopItemBuilder;
 import it.einjojo.shopsystem.shop.CategorizedShop;
 import it.einjojo.shopsystem.shop.ShopManager;

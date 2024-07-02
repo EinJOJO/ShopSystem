@@ -3,6 +3,9 @@ package it.einjojo.shopsystem.item.condition;
 import it.einjojo.shopsystem.item.ShopItem;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface ConditionChecker {
 
     /**

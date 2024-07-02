@@ -28,7 +28,8 @@ public class CategorizedShopGui extends ShopSystemGui {
     public void onOpen(InventoryOpenEvent event) {
         paginationManager.getItems().clear();
         for (ShopItem shopItem : selectedCategory.getItems()) {
-            paginationManager.addItem(new Icon(shopItem.getDisplayItem()).onClick((clickEvent) -> onShopItemClick(shopItem, clickEvent)));
+            paginationManager.addItem(new Icon(shopItem.getDisplayItem())
+                    .onClick((clickEvent) -> onShopItemClick(shopItem, clickEvent)));
         }
         paginationManager.update();
     }
@@ -37,7 +38,7 @@ public class CategorizedShopGui extends ShopSystemGui {
         playClickSound();
     }
 
-    public void setSelectedCategory(Category selectedCategory) {
+    public void setSelectedCategory(@NotNull Category selectedCategory) {
         this.selectedCategory = selectedCategory;
     }
 }

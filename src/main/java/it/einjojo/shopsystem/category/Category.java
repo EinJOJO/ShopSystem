@@ -1,13 +1,16 @@
 package it.einjojo.shopsystem.category;
 
 import it.einjojo.shopsystem.item.ShopItem;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class Category {
+/**
+ * A category is a collection of items that can be bought and sold in a shop.
+ */
+public class Category implements Iterable<ShopItem> {
     private final String name;
     private final List<ShopItem> items = new LinkedList<>();
     @Nullable
@@ -52,5 +55,21 @@ public class Category {
 
     public void setObserver(@Nullable CategoryChangeObserver observer) {
         this.observer = observer;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<ShopItem> iterator() {
+        return getItems().iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super ShopItem> action) {
+        getItems().forEach(action);
+    }
+
+    @Override
+    public Spliterator<ShopItem> spliterator() {
+        return getItems().spliterator();
     }
 }

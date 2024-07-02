@@ -8,7 +8,7 @@ import co.aikar.commands.annotation.Single;
 import co.aikar.commands.annotation.Subcommand;
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.category.Category;
-import it.einjojo.shopsystem.item.ItemStackTradeHandler;
+import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.ShopItem;
 import it.einjojo.shopsystem.shop.CategorizedShop;
 import it.einjojo.shopsystem.shop.Shop;

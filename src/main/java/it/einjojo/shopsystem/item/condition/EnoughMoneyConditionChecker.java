@@ -18,7 +18,7 @@ public class EnoughMoneyConditionChecker implements ConditionChecker {
 
     @Override
     public boolean checkSell(Player player, ShopItem item) {
-        return false;
+        return true;
     }
 
     @Override

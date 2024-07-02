@@ -1,6 +1,7 @@
 package it.einjojo.shopsystem.item;
 
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
+import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -8,6 +9,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Builder for {@link ShopItem}
+ */
 public class ShopItemBuilder {
     private static final ItemStack NO_DISPLAY_ITEM = new ItemStack(Material.PAPER);
     private final List<ConditionChecker> conditionCheckerList = new LinkedList<>();
@@ -17,6 +21,19 @@ public class ShopItemBuilder {
     private Integer sellPrice;
     private Integer stock;
     private ShopItemObserver observer;
+
+    public ShopItemBuilder() {
+    }
+
+    public ShopItemBuilder(ShopItem shopItem) {
+        this.itemTradeHandler = shopItem.getItemTradeHandler();
+        this.displayItem = shopItem.getDisplayItem();
+        this.buyPrice = shopItem.getBuyPrice();
+        this.sellPrice = shopItem.getSellPrice();
+        this.stock = shopItem.getStock();
+        this.observer = shopItem.getObserver();
+        this.conditionCheckerList.addAll(shopItem.getConditionList());
+    }
 
     public ShopItemBuilder item(ItemTradeHandler itemTradeHandler) {
         this.itemTradeHandler = itemTradeHandler;

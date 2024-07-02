@@ -2,7 +2,7 @@ package it.einjojo.shopsystem.economy;
 
 import java.util.UUID;
 
-public abstract class AkaniEconomyHandler implements EconomyHandler {
+public class AkaniEconomyHandler implements EconomyHandler {
 
 
     @Override

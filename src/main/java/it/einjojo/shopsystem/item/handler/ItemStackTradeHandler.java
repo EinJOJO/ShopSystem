@@ -1,4 +1,4 @@
-package it.einjojo.shopsystem.item;
+package it.einjojo.shopsystem.item.handler;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
