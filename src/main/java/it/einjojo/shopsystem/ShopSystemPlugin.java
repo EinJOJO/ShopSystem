@@ -9,6 +9,7 @@ import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.ShopItemBuilder;
 import it.einjojo.shopsystem.shop.CategorizedShop;
 import it.einjojo.shopsystem.shop.ShopManager;
+import it.einjojo.shopsystem.util.Messages;
 import mc.obliviate.inventory.InventoryAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -29,7 +30,6 @@ public class ShopSystemPlugin extends JavaPlugin {
     private ShopSystemPluginConfig config;
     private ShopManager shopManager;
     private CategoryManager categoryManager;
-    private MiniMessage miniMessage;
 
     public static ShopSystemPlugin getInstance() {
         if (instance == null) {
@@ -40,12 +40,12 @@ public class ShopSystemPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
-        new InventoryAPI(this).init();
         config = new ShopSystemPluginConfig(this);
+        new Messages(config.getMiniMessagePrefix()).init();
+        new InventoryAPI(this).init();
+        instance = this;
         shopManager = new ShopManager();
         categoryManager = new CategoryManager();
-        miniMessage = createMiniMessage(MiniMessage.miniMessage().deserialize(config.getMiniMessagePrefix()));
         sendStartupMessage();
         registerCommands();
         loadTestEnvironment();
@@ -69,14 +69,6 @@ public class ShopSystemPlugin extends JavaPlugin {
         new ShopSystemCommand(this, paperManager);
     }
 
-    private MiniMessage createMiniMessage(ComponentLike prefix) {
-        return MiniMessage.builder()
-                .tags(TagResolver.builder()
-                        .resolver(TagResolver.standard())
-                        .tag("prefix", Tag.selfClosingInserting(prefix))
-                        .build())
-                .build();
-    }
 
     private void sendStartupMessage() {
         CommandSender c = getServer().getConsoleSender();
@@ -90,7 +82,7 @@ public class ShopSystemPlugin extends JavaPlugin {
     }
 
     private Component deserializeWithPrimaryStyle(String s) {
-        return miniMessage.deserialize(MessageFormat.format(config.getPrimaryStyle(), s));
+        return Messages.get().deserialize(MessageFormat.format(config.getPrimaryStyle(), s));
     }
 
     @Override
@@ -108,7 +100,7 @@ public class ShopSystemPlugin extends JavaPlugin {
     }
 
     public MiniMessage getMiniMessage() {
-        return miniMessage;
+        return Messages.get().getMiniMessage();
     }
 
     public CategoryManager getCategoryManager() {

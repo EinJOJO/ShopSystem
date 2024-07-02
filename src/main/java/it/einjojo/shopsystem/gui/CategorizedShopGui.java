@@ -11,8 +11,11 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class CategorizedShopGui extends ShopSystemGui {
+    private static final int CATEGORY_ROW = 4;
     private final PaginationManager paginationManager = new PaginationManager(this);
+    private final CategorizedShop shop;
     private @NotNull Category selectedCategory;
+
 
     public CategorizedShopGui(@NotNull Player player, CategorizedShop shop) {
         super(player, "shop", shop.getShopGuiTitle(), 6);
@@ -21,17 +24,23 @@ public class CategorizedShopGui extends ShopSystemGui {
         }
         paginationManager.registerPageSlotsBetween(0, 9 * 3 - 1);
         selectedCategory = shop.getCategories().get(0);
-
+        this.shop = shop;
     }
 
     @Override
     public void onOpen(InventoryOpenEvent event) {
         paginationManager.getItems().clear();
-        for (ShopItem shopItem : selectedCategory.getItems()) {
+        for (ShopItem shopItem : selectedCategory) {
             paginationManager.addItem(new Icon(shopItem.getDisplayItem())
                     .onClick((clickEvent) -> onShopItemClick(shopItem, clickEvent)));
         }
         paginationManager.update();
+    }
+
+    public void renderCategories() {
+        for (Category category : shop.getCategories()) {
+
+        }
     }
 
     public void onShopItemClick(ShopItem clickedShopItem, InventoryClickEvent event) {

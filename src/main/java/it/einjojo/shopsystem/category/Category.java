@@ -1,6 +1,8 @@
 package it.einjojo.shopsystem.category;
 
 import it.einjojo.shopsystem.item.ShopItem;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,14 +14,20 @@ import java.util.function.Consumer;
  */
 public class Category implements Iterable<ShopItem> {
     private final String name;
+    private final Material displayMaterial;
     private final List<ShopItem> items = new LinkedList<>();
     @Nullable
     private transient CategoryChangeObserver observer;
 
 
-    public Category(String name, List<ShopItem> itemList) {
+    public Category(String name, List<ShopItem> itemList, Material displayMaterial) {
         this.name = name;
+        this.displayMaterial = displayMaterial;
         this.items.addAll(itemList);
+    }
+
+    public Material getDisplayMaterial() {
+        return displayMaterial;
     }
 
     /**

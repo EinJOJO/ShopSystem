@@ -2,12 +2,17 @@ package it.einjojo.shopsystem.item;
 
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
 import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
+import it.einjojo.shopsystem.util.Messages;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,6 +26,7 @@ public class ShopItem {
     private final List<ConditionChecker> conditionCheckerList;
     @NotNull
     private ItemStack displayItemBase;
+    private transient ItemStack displayItemCached;
     @Nullable
     private Integer buyPrice;
     @Nullable
@@ -38,12 +44,41 @@ public class ShopItem {
         this.sellPrice = sellPrice;
         this.stock = stock;
         this.conditionCheckerList = conditionCheckerList;
+        updateDisplayItem();
+    }
+
+    public void updateDisplayItem() {
+        displayItemCached = displayItemBase.clone();
+        displayItemCached.setAmount(1);
+        displayItemCached.editMeta(meta -> {
+            List<Component> lore = new LinkedList<>();
+            lore.add(Component.empty());
+            TagResolver[] tagResolvers = getTagResolvers();
+            if (isPurchasable()) {
+                lore.add(Messages.get().deserialize("<gray>Kaufpreis: <yellow><buy-price>", tagResolvers));
+            }
+            if (isSellable()) {
+                lore.add(Messages.get().deserialize("<gray>Verkaufspreis: <yellow><sell-price>", tagResolvers));
+            }
+            if (stock != null) {
+                lore.add(Messages.get().deserialize("<gray>Lagerbestand: <stock>", tagResolvers));
+            }
+            lore.add(Component.empty());
+            meta.lore(lore);
+        });
+    }
+
+    public TagResolver[] getTagResolvers() {
+        return new TagResolver[]{
+                Placeholder.parsed("buy-price", buyPrice != null ? buyPrice.toString() : "<red>N/A</red>"),
+                Placeholder.parsed("sell-price", sellPrice != null ? sellPrice.toString() : "<red>N/A</red>"),
+                Placeholder.parsed("stock", stock != null ? stock.toString() : "<red>N/A</red>")
+        };
     }
 
     public static ShopItemBuilder builder() {
         return new ShopItemBuilder();
     }
-
 
 
     /**
@@ -96,11 +131,12 @@ public class ShopItem {
     }
 
     public ItemStack getDisplayItem() {
-        return displayItemBase;
+        return displayItemCached;
     }
 
     public void setDisplayItemBase(ItemStack displayItemBase) {
         this.displayItemBase = displayItemBase;
+        updateDisplayItem();
         callChangeObserver();
 
     }
@@ -119,6 +155,7 @@ public class ShopItem {
 
     public void setBuyPrice(@Nullable Integer buyPrice) {
         this.buyPrice = buyPrice;
+        updateDisplayItem();
         callChangeObserver();
     }
 
@@ -128,6 +165,7 @@ public class ShopItem {
 
     public void setSellPrice(@Nullable Integer sellPrice) {
         this.sellPrice = sellPrice;
+        updateDisplayItem();
         callChangeObserver();
     }
 
@@ -137,6 +175,7 @@ public class ShopItem {
 
     public void setStock(@Nullable Integer stock) {
         this.stock = stock;
+        updateDisplayItem();
         callChangeObserver();
     }
 
