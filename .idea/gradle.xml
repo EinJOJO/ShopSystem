@@ -9,6 +9,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/platforms" />
+            <option value="$PROJECT_DIR$/platforms/akani" />
+            <option value="$PROJECT_DIR$/platforms/common" />
           </set>
         </option>
       </GradleProjectSettings>
