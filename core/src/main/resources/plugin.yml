@@ -3,3 +3,4 @@ main: it.einjojo.shopsystem.ShopSystemPlugin
 version: ${version}
 author: EinJojo
 description: Das Shopsystem ermöglicht es mehrere Shops zu erstellen und zu verwalten. Damit kann man einfach und unkompliziert shops erstellen.
+api-version: 1.20
