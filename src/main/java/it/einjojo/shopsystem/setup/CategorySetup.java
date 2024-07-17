@@ -8,6 +8,7 @@ import it.einjojo.shopsystem.item.ShopItem;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -17,8 +18,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Setup for creating a new category.
+ * Call register() to start the setup.
+ */
 public class CategorySetup extends AbstractSetup<Category> {
-    private @NotNull CategorySetup.ISetupStage current;
+    private @NotNull CategorySetup.CategorySetupStage current;
     private final CategoryBuilder categoryBuilder;
 
     public CategorySetup(Player player, ShopSystemPlugin plugin, CategoryBuilder categoryBuilder) {
@@ -31,7 +36,7 @@ public class CategorySetup extends AbstractSetup<Category> {
         }
     }
 
-    private void setCurrentAndPrompt(@NotNull CategorySetup.ISetupStage current) {
+    private void setCurrentAndPrompt(@NotNull CategorySetup.CategorySetupStage current) {
         this.current = current;
         current.prompt(this);
     }
@@ -76,10 +81,15 @@ public class CategorySetup extends AbstractSetup<Category> {
         }
     }
 
-    private interface ISetupStage extends SetupStage<CategorySetup> {
+    private interface CategorySetupStage extends SetupStage<CategorySetup> {
+        default void handleChatInput(CategorySetup setup, String input) {
+        }
+
+        default void handleItemDrop(CategorySetup setup, ItemStack dropped) {
+        }
     }
 
-    private enum Stage implements ISetupStage {
+    private enum Stage implements CategorySetupStage {
         ACTION_SELECT {
             @Override
             public void prompt(CategorySetup s) {
@@ -105,7 +115,7 @@ public class CategorySetup extends AbstractSetup<Category> {
                         setup.setCurrentAndPrompt(MATERIAL);
                         break;
                     case "4":
-                        setup.setCurrentAndPrompt(new ProxiedShopItemSetupStage());
+                        setup.setCurrentAndPrompt(new ShopItemSetupStage(setup));
                         break;
                     case "5":
                         setup.setCurrentAndPrompt(ITEM_REMOVE);
@@ -128,7 +138,7 @@ public class CategorySetup extends AbstractSetup<Category> {
 
             @Override
             public void handleChatInput(CategorySetup setup, String input) {
-                setup.categoryBuilder.setDisplayName(setup.getPlugin().getMiniMessage().deserialize(input));
+                setup.categoryBuilder.displayName(setup.getPlugin().getMiniMessage().deserialize(input));
                 setup.predicateOrActionSelect(builder -> builder.getDescription() == null, MATERIAL);
             }
         },
@@ -141,7 +151,7 @@ public class CategorySetup extends AbstractSetup<Category> {
 
             @Override
             public void handleChatInput(CategorySetup setup, String input) {
-                setup.categoryBuilder.setDescription(input);
+                setup.categoryBuilder.description(input);
                 setup.predicateOrActionSelect(builder -> builder.getDisplayMaterial() == null, MATERIAL);
             }
         },
@@ -153,7 +163,7 @@ public class CategorySetup extends AbstractSetup<Category> {
 
             @Override
             public void handleItemDrop(CategorySetup setup, ItemStack dropped) {
-                setup.categoryBuilder.setDisplayMaterial(dropped.getType());
+                setup.categoryBuilder.displayMaterial(dropped.getType());
                 setup.setCurrentAndPrompt(ACTION_SELECT);
             }
         },
@@ -171,26 +181,30 @@ public class CategorySetup extends AbstractSetup<Category> {
         }
     }
 
-    private static class ProxiedShopItemSetupStage extends ShopItemSetupStage<CategorySetup> {
+    private static class ShopItemSetupStage implements CategorySetupStage {
+        private final CategorySetup parent;
+        private final ShopItemSetup itemSetup;
 
-        @Override
-        public void prompt(CategorySetup setup) {
-
+        public ShopItemSetupStage(CategorySetup parent) {
+            this.parent = parent;
+            itemSetup = new ShopItemSetup(parent.getPlugin(), Bukkit.getPlayer(parent.getPlayerUuid()));
+            itemSetup.setOnComplete((shopitem) -> {
+                parent.categoryBuilder.addItem(shopitem);
+                parent.current = Stage.ACTION_SELECT;
+                parent.register(); // post-register will prompt;
+            });
         }
 
         @Override
-        public void handleChatInput(CategorySetup setup, String input) {
-
-        }
-
-        @Override
-        public void handleItemDrop(CategorySetup setup, ItemStack dropped) {
-
+        public void prompt(CategorySetup ignore) {
+            parent.sendMessage("<yellow>Erstelle ein neues Item für die Kategorie");
+            parent.unregister();
+            itemSetup.register();
         }
     }
 
 
-    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, ISetupStage setupStage) {
+    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, CategorySetupStage setupStage) {
         if (setupPredicate.test(this.categoryBuilder)) {
             setCurrentAndPrompt(setupStage);
         } else {

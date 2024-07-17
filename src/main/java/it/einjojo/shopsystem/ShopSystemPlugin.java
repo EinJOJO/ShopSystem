@@ -12,6 +12,7 @@ import it.einjojo.shopsystem.shop.ShopManager;
 import it.einjojo.shopsystem.util.Messages;
 import mc.obliviate.inventory.InventoryAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -50,11 +51,17 @@ public class ShopSystemPlugin extends JavaPlugin {
     }
 
     private void loadTestEnvironment() {
-        categoryManager.registerCategory(new CategoryBuilder().setName("test").setItemList(List.of(new ShopItemBuilder()
-                .item(new ItemStackTradeHandler(new ItemStack(Material.ACACIA_PLANKS)))
-                .buyPrice(200)
-                .sellPrice(100)
-                .build())).setDisplayName(Component.text("")).setDescription("").setDisplayMaterial(Material.OAK_PLANKS).createCategory());
+        categoryManager.registerCategory(new CategoryBuilder().setItemList(List.of(
+                        new ShopItemBuilder()
+                                .withItemStack(new ItemStack(Material.ACACIA_PLANKS))
+                                .buyPrice(200)
+                                .sellPrice(100)
+                                .build()))
+                .name("holz")
+                .displayName(Component.text("Holz", NamedTextColor.RED))
+                .description("")
+                .displayMaterial(Material.OAK_PLANKS)
+                .build());
         var shop = new CategorizedShop("testshop");
         shop.addCategory(categoryManager.getCategories().get("test"));
         shopManager.registerShop(shop);

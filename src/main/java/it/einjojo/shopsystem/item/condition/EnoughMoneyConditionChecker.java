@@ -4,6 +4,9 @@ import it.einjojo.shopsystem.economy.EconomyHandler;
 import it.einjojo.shopsystem.item.ShopItem;
 import org.bukkit.entity.Player;
 
+/**
+ * Checks if the player has enough money to buy the item
+ */
 public class EnoughMoneyConditionChecker implements ConditionChecker {
     private final EconomyHandler economyHandler;
 

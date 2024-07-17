@@ -24,8 +24,13 @@ public class CategoryManager {
         categories.remove(category.getName());
     }
 
-
-    public void onCategoryChange(Category category) {
-
+    public void subscribe(CategoryListener listener) {
+        listeners.add(listener);
     }
+
+    public void unsubscribe(CategoryListener listener) {
+        listeners.remove(listener);
+    }
+
+
 }

@@ -4,13 +4,11 @@ import com.google.common.base.Preconditions;
 import it.einjojo.shopsystem.item.ShopItem;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * A category is a collection of items that can be bought and sold in a shop.
@@ -44,11 +42,11 @@ public class Category implements Iterable<ShopItem> {
 
     public CategoryBuilder builder() {
         return new CategoryBuilder()
-                .setName(name)
+                .name(name)
                 .setItemList(items)
-                .setDisplayName(displayName)
-                .setDescription(description)
-                .setDisplayMaterial(displayMaterial);
+                .displayName(displayName)
+                .description(description)
+                .displayMaterial(displayMaterial);
     }
 
     /**
@@ -58,6 +56,13 @@ public class Category implements Iterable<ShopItem> {
         return Collections.unmodifiableList(items);
     }
 
+    public boolean addItem(@NotNull ShopItem item) {
+        return items.add(item);
+    }
+
+    public boolean removeItem(@NotNull ShopItem item) {
+        return items.remove(item);
+    }
 
     public @NotNull String getName() {
         return name;

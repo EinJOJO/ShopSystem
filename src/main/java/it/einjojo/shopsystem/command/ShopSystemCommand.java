@@ -2,12 +2,10 @@ package it.einjojo.shopsystem.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.PaperCommandManager;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.Single;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.category.Category;
+import it.einjojo.shopsystem.category.CategoryBuilder;
 import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.ShopItem;
 import it.einjojo.shopsystem.setup.CategorySetup;
@@ -18,7 +16,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Optional;
 
 @CommandAlias("shopsystem")
@@ -55,7 +52,7 @@ public class ShopSystemCommand extends BaseCommand {
     @Subcommand("create category")
     @CommandCompletion("<id> @nothing")
     public void createCategory(Player sender, @Single String categoryId) {
-        var setup = new CategorySetup(sender, shopSystem);
+        var setup = new CategorySetup(sender, shopSystem, new CategoryBuilder());
         setup.setOnComplete(category -> {
             shopSystem.getCategoryManager().registerCategory(category);
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><id></red> wurde erstellt!",
@@ -68,6 +65,7 @@ public class ShopSystemCommand extends BaseCommand {
 
     @Subcommand("category assign")
     @CommandCompletion("@category @shop @nothing")
+    @Description("Assign a category to a shop")
     public void assignCategory(Player sender, Category category, Shop shop) {
         if (shop instanceof CategorizedShop categorizedShop) {
             categorizedShop.addCategory(category);
@@ -80,9 +78,10 @@ public class ShopSystemCommand extends BaseCommand {
 
     @Subcommand("category additem")
     @CommandCompletion("@category @nothing")
+    @Description("Add an itemstack to a category")
     public void addItemToCategory(Player sender, Category category) {
         category.addItem(ShopItem.builder()
-                .item(new ItemStackTradeHandler(sender.getInventory().getItemInMainHand()))
+                .withItemStack(sender.getInventory().getItemInMainHand())
                 .sellPrice(10)
                 .buyPrice(20)
                 .build());
@@ -97,7 +96,8 @@ public class ShopSystemCommand extends BaseCommand {
         try {
             shop.open(sender);
         } catch (Exception ex) {
-            sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><red>Ein Fehler ist aufgetreten: <error>!", Placeholder.parsed("error", ex.getMessage())));
+            sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><red>Ein Fehler ist aufgetreten: <error>!",
+                    Placeholder.parsed("error", ex.getMessage())));
         }
     }
 

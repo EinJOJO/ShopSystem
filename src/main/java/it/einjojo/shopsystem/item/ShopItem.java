@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Item that can be bought and sold in a shop with conditions.
@@ -121,12 +122,6 @@ public class ShopItem {
         this.observer = observer;
     }
 
-    public void callChangeObserver() {
-        if (observer != null) {
-            observer.onItemChange(this);
-        }
-    }
-
     public ItemTradeHandler getItem() {
         return itemTradeHandler;
     }
@@ -139,7 +134,6 @@ public class ShopItem {
         this.displayItemBase = displayItemBase;
         updateDisplayItem();
         callChangeObserver();
-
     }
 
     public boolean isPurchasable() {
@@ -158,6 +152,7 @@ public class ShopItem {
         this.buyPrice = buyPrice;
         updateDisplayItem();
         callChangeObserver();
+        withObserver(observer -> observer.onBuyPriceChange(this));
     }
 
     public @Nullable Integer getSellPrice() {
@@ -168,6 +163,7 @@ public class ShopItem {
         this.sellPrice = sellPrice;
         updateDisplayItem();
         callChangeObserver();
+        withObserver(observer -> observer.onSellPriceChange(this));
     }
 
     public @Nullable Integer getStock() {
@@ -178,18 +174,21 @@ public class ShopItem {
         this.stock = stock;
         updateDisplayItem();
         callChangeObserver();
+        withObserver(observer -> observer.onStockChange(this));
     }
 
     public void addCondition(ConditionChecker conditionChecker) {
         if (conditionChecker == null) return;
         conditionCheckerList.add(conditionChecker);
         callChangeObserver();
+        withObserver(observer -> observer.onConditionChange(this));
     }
 
     public void removeCondition(ConditionChecker conditionChecker) {
         if (conditionChecker == null) return;
         conditionCheckerList.remove(conditionChecker);
         callChangeObserver();
+        withObserver(observer -> observer.onConditionChange(this));
     }
 
     public @NotNull ItemTradeHandler getItemTradeHandler() {
@@ -203,6 +202,16 @@ public class ShopItem {
 
     public @Nullable ShopItemObserver getObserver() {
         return observer;
+    }
+
+    private void callChangeObserver() {
+        withObserver(observer -> observer.onChange(this));
+    }
+
+    private void withObserver(Consumer<@NotNull ShopItemObserver> consumer) {
+        if (observer != null) {
+            consumer.accept(observer);
+        }
     }
 
     @Override

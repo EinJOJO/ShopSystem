@@ -18,7 +18,11 @@ public class CategoryBuilder {
     private String description;
     private Material displayMaterial;
 
-    public CategoryBuilder setName(String name) {
+    public CategoryBuilder() {
+        defaults();
+    }
+
+    public CategoryBuilder name(String name) {
         this.name = name;
         return this;
     }
@@ -39,17 +43,17 @@ public class CategoryBuilder {
     }
 
 
-    public CategoryBuilder setDisplayName(Component displayName) {
+    public CategoryBuilder displayName(Component displayName) {
         this.displayName = displayName;
         return this;
     }
 
-    public CategoryBuilder setDescription(String description) {
+    public CategoryBuilder description(String description) {
         this.description = description;
         return this;
     }
 
-    public CategoryBuilder setDisplayMaterial(Material displayMaterial) {
+    public CategoryBuilder displayMaterial(Material displayMaterial) {
         this.displayMaterial = displayMaterial;
         return this;
     }
@@ -83,9 +87,9 @@ public class CategoryBuilder {
 
     public CategoryBuilder defaults() {
         return this
-                .setDisplayName(Component.text("Default Category", NamedTextColor.WHITE))
-                .setDescription("Default category description")
-                .setDisplayMaterial(Material.BARRIER);
+                .displayName(Component.text("no name", NamedTextColor.WHITE))
+                .description("no description")
+                .displayMaterial(Material.BARRIER);
 
     }
 

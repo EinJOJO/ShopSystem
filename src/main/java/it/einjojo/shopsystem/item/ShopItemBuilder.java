@@ -1,9 +1,12 @@
 package it.einjojo.shopsystem.item;
 
+import com.google.common.base.Preconditions;
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
+import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,8 +38,25 @@ public class ShopItemBuilder {
         this.conditionCheckerList.addAll(shopItem.getConditionList());
     }
 
-    public ShopItemBuilder item(ItemTradeHandler itemTradeHandler) {
+    public ShopItemBuilder itemTradeHandler(ItemTradeHandler itemTradeHandler) {
         this.itemTradeHandler = itemTradeHandler;
+        return this;
+    }
+
+    /**
+     * Sets item trade handler and display icon to the item
+     *
+     * @return this builder
+     * @params itemsStack should not be air or null.
+     */
+    public ShopItemBuilder withItemStack(@NotNull ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack);
+        if (itemStack.getType().isAir()) {
+            throw new IllegalArgumentException("ItemStack must not be air");
+        }
+
+        itemTradeHandler(new ItemStackTradeHandler(itemStack));
+        displayItem(itemStack);
         return this;
     }
 
