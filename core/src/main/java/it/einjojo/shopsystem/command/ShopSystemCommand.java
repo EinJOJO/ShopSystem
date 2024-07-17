@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Optional;
 
-@CommandAlias("it/einjojo/shopsystem")
+@CommandAlias("shopsystem")
 public class ShopSystemCommand extends BaseCommand {
     private final ShopSystemPlugin shopSystem;
 
