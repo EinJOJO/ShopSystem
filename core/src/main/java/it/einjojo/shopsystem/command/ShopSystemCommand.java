@@ -2,6 +2,7 @@ package it.einjojo.shopsystem.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.annotation.*;
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.category.Category;
 import it.einjojo.shopsystem.category.CategoryBuilder;

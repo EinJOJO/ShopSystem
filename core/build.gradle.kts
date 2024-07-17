@@ -1,6 +1,7 @@
 plugins {
     id("java")
     alias(libs.plugins.shadow)
+    alias(libs.plugins.runpaper)
 }
 
 repositories {
@@ -46,6 +47,11 @@ tasks {
 
 
     }
+
+    runServer {
+        minecraftVersion("1.20.4")
+    }
+
 
     shadowJar {
         dependsOn(project.project(":platforms").subprojects.map {

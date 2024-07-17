@@ -1,5 +1,6 @@
 package it.einjojo.shopsystem.item.condition;
 
+import it.einjojo.shopsystem.economy.EconomyHandler;
 import it.einjojo.shopsystem.item.ShopItem;
 import org.bukkit.entity.Player;
 
