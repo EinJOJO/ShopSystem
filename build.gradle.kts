@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://repo.akani.dev/releases")
     maven("https://repo.codemc.io/repository/maven-releases/")

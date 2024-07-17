@@ -10,6 +10,7 @@ import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.category.Category;
 import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
 import it.einjojo.shopsystem.item.ShopItem;
+import it.einjojo.shopsystem.setup.CategorySetup;
 import it.einjojo.shopsystem.shop.CategorizedShop;
 import it.einjojo.shopsystem.shop.Shop;
 import it.einjojo.shopsystem.shop.ShopFactory;
@@ -54,10 +55,15 @@ public class ShopSystemCommand extends BaseCommand {
     @Subcommand("create category")
     @CommandCompletion("<id> @nothing")
     public void createCategory(Player sender, @Single String categoryId) {
-        var category = new Category(categoryId, new LinkedList<>());
-        shopSystem.getCategoryManager().registerCategory(category);
-        sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><id></red> wurde erstellt!",
-                Placeholder.parsed("id", categoryId)));
+        var setup = new CategorySetup(sender, shopSystem);
+        setup.setOnComplete(category -> {
+            shopSystem.getCategoryManager().registerCategory(category);
+            sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><id></red> wurde erstellt!",
+                    Placeholder.unparsed("id", categoryId)));
+        });
+        setup.register();
+
+
     }
 
     @Subcommand("category assign")

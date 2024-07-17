@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Item that can be bought and sold in a shop with conditions.
@@ -202,5 +203,31 @@ public class ShopItem {
 
     public @Nullable ShopItemObserver getObserver() {
         return observer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShopItem shopItem = (ShopItem) o;
+        return Objects.equals(itemTradeHandler, shopItem.itemTradeHandler) && Objects.equals(conditionCheckerList, shopItem.conditionCheckerList) && Objects.equals(displayItemBase, shopItem.displayItemBase) && Objects.equals(displayItemCached, shopItem.displayItemCached) && Objects.equals(buyPrice, shopItem.buyPrice) && Objects.equals(sellPrice, shopItem.sellPrice) && Objects.equals(observer, shopItem.observer) && Objects.equals(stock, shopItem.stock);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemTradeHandler, conditionCheckerList, displayItemBase, displayItemCached, buyPrice, sellPrice, observer, stock);
+    }
+
+    @Override
+    public String toString() {
+        return "ShopItem{" +
+                "itemTradeHandler=" + itemTradeHandler.getClass().getSimpleName() +
+                ", conditions=" + conditionCheckerList.size() +
+                ", displayItemBase=" + displayItemBase.getType().name() +
+                ", buyPrice=" + buyPrice +
+                ", sellPrice=" + sellPrice +
+                ", observed=" + ((observer == null) ? "no" : "yes") +
+                ", stock=" + stock +
+                '}';
     }
 }

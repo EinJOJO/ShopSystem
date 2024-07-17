@@ -1,6 +1,8 @@
 package it.einjojo.shopsystem.category;
 
+import com.google.common.base.Preconditions;
 import it.einjojo.shopsystem.item.ShopItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -8,26 +10,45 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A category is a collection of items that can be bought and sold in a shop.
  */
 public class Category implements Iterable<ShopItem> {
-    private final String name;
-    private final Material displayMaterial;
-    private final List<ShopItem> items = new LinkedList<>();
-    @Nullable
-    private transient CategoryChangeObserver observer;
+    private final @NotNull String name;
+    private final @NotNull Component displayName;
+    private final @NotNull String description;
+    private final @NotNull Material displayMaterial;
+    private final @NotNull List<ShopItem> items = new LinkedList<>();
 
 
-    public Category(String name, List<ShopItem> itemList, Material displayMaterial) {
+    public Category(@NotNull String name, @Nullable Collection<ShopItem> itemList, @NotNull Component displayName, @NotNull String description, @NotNull Material displayMaterial) {
+        Preconditions.checkNotNull(name);
+        Preconditions.checkNotNull(displayName);
+        Preconditions.checkNotNull(description);
+        Preconditions.checkNotNull(displayMaterial);
         this.name = name;
+        this.displayName = displayName;
+        this.description = description;
         this.displayMaterial = displayMaterial;
-        this.items.addAll(itemList);
+        if (itemList != null) {
+            this.items.addAll(itemList);
+        }
     }
 
-    public Material getDisplayMaterial() {
+    public @NotNull Material getDisplayMaterial() {
         return displayMaterial;
+    }
+
+
+    public CategoryBuilder builder() {
+        return new CategoryBuilder()
+                .setName(name)
+                .setItemList(items)
+                .setDisplayName(displayName)
+                .setDescription(description)
+                .setDisplayMaterial(displayMaterial);
     }
 
     /**
@@ -37,33 +58,11 @@ public class Category implements Iterable<ShopItem> {
         return Collections.unmodifiableList(items);
     }
 
-    public void addItem(ShopItem item) {
-        items.add(item);
-        callChangeObserver();
-    }
 
-    public void removeItem(ShopItem item) {
-        items.remove(item);
-        callChangeObserver();
-    }
-
-    protected void callChangeObserver() {
-        if (observer != null) {
-            observer.onCategoryChange(this);
-        }
-    }
-
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public @Nullable CategoryChangeObserver getObserver() {
-        return observer;
-    }
-
-    public void setObserver(@Nullable CategoryChangeObserver observer) {
-        this.observer = observer;
-    }
 
     @NotNull
     @Override
@@ -79,5 +78,13 @@ public class Category implements Iterable<ShopItem> {
     @Override
     public Spliterator<ShopItem> spliterator() {
         return getItems().spliterator();
+    }
+
+    public @NotNull Component getDisplayName() {
+        return displayName;
+    }
+
+    public @NotNull String getDescription() {
+        return description;
     }
 }

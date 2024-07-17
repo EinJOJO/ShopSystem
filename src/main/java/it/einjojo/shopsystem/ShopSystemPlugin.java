@@ -1,7 +1,7 @@
 package it.einjojo.shopsystem;
 
 import co.aikar.commands.PaperCommandManager;
-import it.einjojo.shopsystem.category.Category;
+import it.einjojo.shopsystem.category.CategoryBuilder;
 import it.einjojo.shopsystem.category.CategoryManager;
 import it.einjojo.shopsystem.command.ShopSystemCommand;
 import it.einjojo.shopsystem.config.ShopSystemPluginConfig;
@@ -12,10 +12,7 @@ import it.einjojo.shopsystem.shop.ShopManager;
 import it.einjojo.shopsystem.util.Messages;
 import mc.obliviate.inventory.InventoryAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -53,11 +50,11 @@ public class ShopSystemPlugin extends JavaPlugin {
     }
 
     private void loadTestEnvironment() {
-        categoryManager.registerCategory(new Category("test", List.of(new ShopItemBuilder()
+        categoryManager.registerCategory(new CategoryBuilder().setName("test").setItemList(List.of(new ShopItemBuilder()
                 .item(new ItemStackTradeHandler(new ItemStack(Material.ACACIA_PLANKS)))
                 .buyPrice(200)
                 .sellPrice(100)
-                .build())));
+                .build())).setDisplayName(Component.text("")).setDescription("").setDisplayMaterial(Material.OAK_PLANKS).createCategory());
         var shop = new CategorizedShop("testshop");
         shop.addCategory(categoryManager.getCategories().get("test"));
         shopManager.registerShop(shop);
