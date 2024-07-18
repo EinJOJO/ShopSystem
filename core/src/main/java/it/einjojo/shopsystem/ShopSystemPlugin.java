@@ -5,6 +5,8 @@ import it.einjojo.shopsystem.category.CategoryBuilder;
 import it.einjojo.shopsystem.category.CategoryManager;
 import it.einjojo.shopsystem.command.ShopSystemCommand;
 import it.einjojo.shopsystem.config.ShopSystemPluginConfig;
+import it.einjojo.shopsystem.economy.EconomyHandler;
+import it.einjojo.shopsystem.economy.EconomyHandlerFactory;
 import it.einjojo.shopsystem.item.ShopItemBuilder;
 import it.einjojo.shopsystem.shop.CategorizedShop;
 import it.einjojo.shopsystem.shop.ShopManager;
@@ -26,6 +28,7 @@ public class ShopSystemPlugin extends JavaPlugin {
     private static volatile ShopSystemPlugin instance;
     private ShopSystemPluginConfig config;
     private ShopManager shopManager;
+    private EconomyHandler economyHandler;
     private CategoryManager categoryManager;
 
     public static ShopSystemPlugin getInstance() {
@@ -37,10 +40,11 @@ public class ShopSystemPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+        economyHandler = new EconomyHandlerFactory().createEconomyHandler();
         config = new ShopSystemPluginConfig(this);
         new Messages(config.getMiniMessagePrefix()).init();
         new InventoryAPI(this).init();
-        instance = this;
         shopManager = new ShopManager();
         categoryManager = new CategoryManager();
         sendStartupMessage();
@@ -55,14 +59,35 @@ public class ShopSystemPlugin extends JavaPlugin {
                                 .withItemStack(new ItemStack(Material.ACACIA_PLANKS))
                                 .buyPrice(200)
                                 .sellPrice(100)
+                                .build(),
+                        new ShopItemBuilder()
+                                .withItemStack(new ItemStack(Material.OAK_BOAT))
+                                .buyPrice(20)
+                                .sellPrice(10)
                                 .build()))
                 .name("holz")
                 .displayName(Component.text("Holz", NamedTextColor.RED))
-                .description("")
+                .description("Stuff.")
+                .displayMaterial(Material.OAK_PLANKS)
+                .build());
+        categoryManager.registerCategory(new CategoryBuilder().setItemList(List.of(
+                        new ShopItemBuilder()
+                                .withItemStack(new ItemStack(Material.FISHING_ROD))
+                                .buyPrice(200)
+                                .sellPrice(100)
+                                .build(),
+                        new ShopItemBuilder()
+                                .withItemStack(new ItemStack(Material.COOKED_COD))
+                                .buyPrice(20)
+                                .sellPrice(10)
+                                .build()))
+                .name("fisch")
+                .displayName(Component.text("Fisch", NamedTextColor.RED))
+                .description("Stuff.")
                 .displayMaterial(Material.OAK_PLANKS)
                 .build());
         var shop = new CategorizedShop("testshop");
-        shop.addCategory(categoryManager.getCategories().get("test"));
+        shop.addCategory(categoryManager.getCategories().get("holz"));
         shopManager.registerShop(shop);
 
     }
@@ -91,6 +116,10 @@ public class ShopSystemPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
 
+    }
+
+    public EconomyHandler getEconomyHandler() {
+        return economyHandler;
     }
 
     @NotNull

@@ -1,6 +1,8 @@
 package it.einjojo.shopsystem.item;
 
+import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
+import it.einjojo.shopsystem.item.handler.ItemTradeException;
 import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
 import it.einjojo.shopsystem.util.Messages;
 import net.kyori.adventure.text.Component;
@@ -11,10 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -25,7 +24,7 @@ public class ShopItem {
     @NotNull
     private final ItemTradeHandler itemTradeHandler;
     @NotNull
-    private final List<ConditionChecker> conditionCheckerList;
+    private final List<ConditionChecker> conditionCheckerList = new LinkedList<>();
     @NotNull
     private ItemStack displayItemBase;
     private transient ItemStack displayItemCached;
@@ -39,13 +38,13 @@ public class ShopItem {
     @Nullable
     private Integer stock;
 
-    public ShopItem(@NotNull ItemTradeHandler itemTradeHandler, @NotNull ItemStack displayItemBase, @Nullable Integer buyPrice, @Nullable Integer sellPrice, @Nullable Integer stock, @NotNull List<ConditionChecker> conditionCheckerList) {
+    public ShopItem(@NotNull ItemTradeHandler itemTradeHandler, @NotNull ItemStack displayItemBase, @Nullable Integer buyPrice, @Nullable Integer sellPrice, @Nullable Integer stock, @NotNull Collection<ConditionChecker> conditionChecks) {
         this.itemTradeHandler = itemTradeHandler;
         this.displayItemBase = displayItemBase;
         this.buyPrice = buyPrice;
         this.sellPrice = sellPrice;
         this.stock = stock;
-        this.conditionCheckerList = conditionCheckerList;
+        this.conditionCheckerList.addAll(conditionChecks);
         updateDisplayItem();
     }
 
@@ -96,9 +95,9 @@ public class ShopItem {
      * @param player Player to check
      * @return failed condition or null if all conditions are met
      */
-    protected @Nullable ConditionChecker checkBuyCondition(Player player) {
+    protected @Nullable ConditionChecker checkBuyCondition(Player player, int amount) {
         for (ConditionChecker conditionChecker : conditionCheckerList) {
-            if (!conditionChecker.checkBuy(player, this)) {
+            if (!conditionChecker.checkBuy(player, this, amount)) {
                 return conditionChecker;
             }
         }
@@ -109,9 +108,9 @@ public class ShopItem {
      * @param player Player to check
      * @return failed condition or null if all conditions are met
      */
-    protected @Nullable ConditionChecker checkSellCondition(Player player) {
+    protected @Nullable ConditionChecker checkSellCondition(Player player, int amount) {
         for (ConditionChecker conditionChecker : conditionCheckerList) {
-            if (!conditionChecker.checkSell(player, this)) {
+            if (!conditionChecker.checkSell(player, this, amount)) {
                 return conditionChecker;
             }
         }
@@ -135,6 +134,7 @@ public class ShopItem {
         updateDisplayItem();
         callChangeObserver();
     }
+
 
     public boolean isPurchasable() {
         return buyPrice != null;
@@ -166,11 +166,64 @@ public class ShopItem {
         withObserver(observer -> observer.onSellPriceChange(this));
     }
 
+    /**
+     * Buy the item
+     *
+     * @param buyer  Player who wants to buy the item
+     * @param plugin ShopSystemPlugin
+     * @param amount Amount of items to buy
+     * @return true if the item was bought successfully
+     * @throws ItemTradeException if the item could not be bought because of weird reasons
+     */
+    public boolean buy(Player buyer, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
+        if (buyPrice == null) {
+            throw new ItemTradeException("Artikel kann nicht gekauft werden.");
+        }
+        ConditionChecker failed = checkBuyCondition(buyer, amount);
+        if (failed != null) {
+            Component component = plugin.getMiniMessage().deserialize(failed.getBuyFailureText(buyer, this, amount), getTagResolvers());
+            buyer.sendMessage(component);
+            return false;
+        }
+        getItemTradeHandler().giveItem(buyer, amount);
+        plugin.getEconomyHandler().remove(buyer.getUniqueId(), buyPrice * amount);
+        if (stock != null) {
+            setStock(stock - amount);
+        }
+        return true;
+    }
+
+    public boolean sell(Player player, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
+        if (sellPrice == null) {
+            throw new ItemTradeException("Artikel kann nicht verkauft werden.");
+        }
+        ConditionChecker failed = checkSellCondition(player, amount);
+        if (failed != null) {
+            Component component = plugin.getMiniMessage().deserialize(failed.getSellFailureText(player, this, amount), getTagResolvers());
+            player.sendMessage(component);
+            return false;
+        }
+        getItemTradeHandler().removeItem(player, amount);
+        plugin.getEconomyHandler().add(player.getUniqueId(), sellPrice * amount);
+        if (stock != null) {
+            setStock(stock + amount);
+        }
+        return true;
+    }
+
+
     public @Nullable Integer getStock() {
         return stock;
     }
 
+    /**
+     * @param stock Stock of the item. Null if the item has no stock limit
+     * @throws IllegalArgumentException if stock is negative
+     */
     public void setStock(@Nullable Integer stock) {
+        if (stock != null && stock < 0) {
+            throw new IllegalArgumentException("Stock must be positive or null");
+        }
         this.stock = stock;
         updateDisplayItem();
         callChangeObserver();

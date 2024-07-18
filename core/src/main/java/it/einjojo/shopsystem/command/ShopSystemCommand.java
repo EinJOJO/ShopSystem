@@ -91,9 +91,13 @@ public class ShopSystemCommand extends BaseCommand {
 
     @Subcommand("open")
     @CommandCompletion("@shop @nothing")
-    public void openShop(Player sender, Shop shop) {
+    public void openShop(Player sender, Shop shop, @Values("sell|buy") String type) {
         try {
-            shop.open(sender);
+            if (type.equalsIgnoreCase("sell")) {
+                shop.openSell(sender);
+            } else {
+                shop.openBuy(sender);
+            }
         } catch (Exception ex) {
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><red>Ein Fehler ist aufgetreten: <error>!",
                     Placeholder.parsed("error", ex.getMessage())));
