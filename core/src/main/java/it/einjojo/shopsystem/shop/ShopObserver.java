@@ -1,6 +1,6 @@
 package it.einjojo.shopsystem.shop;
 
-public interface ShopChangeObserver {
+public interface ShopObserver {
 
     void onShopChange(Shop shop);
 

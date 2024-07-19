@@ -15,8 +15,11 @@ public class NullEconomyHandler implements EconomyHandler {
         if (p == null) {
             return false;
         }
-        p.sendActionBar(Component.text("Economy Check: Halte ein Item in der Hand den Check zu bestehen.", NamedTextColor.GRAY));
-        return !p.getInventory().getItemInMainHand().getType().isAir();
+        boolean has = !p.getInventory().getItemInMainHand().getType().isAir();
+        p.sendActionBar(Component.text("Economy Check: Halte ein Item in der Hand den Check zu bestehen.", NamedTextColor.GRAY).append(
+                Component.text(has, has ? NamedTextColor.GREEN : NamedTextColor.RED)
+        ));
+        return has;
     }
 
     @Override

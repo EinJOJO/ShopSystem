@@ -1,9 +1,10 @@
 package it.einjojo.shopsystem.item.handler;
 
+import it.einjojo.shopsystem.item.ItemTradeException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemStackTradeHandler implements ItemTradeHandler {
+public class ItemStackTradeHandler implements TradeHandler {
     private final ItemStack itemStack;
 
     public ItemStackTradeHandler(ItemStack itemStack) {

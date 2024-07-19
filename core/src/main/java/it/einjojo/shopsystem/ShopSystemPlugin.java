@@ -86,7 +86,7 @@ public class ShopSystemPlugin extends JavaPlugin {
                 .description("Stuff.")
                 .displayMaterial(Material.OAK_PLANKS)
                 .build());
-        var shop = new CategorizedShop("testshop");
+        var shop = new CategorizedShop("testshop", Component.text("TEST", NamedTextColor.RED));
         shop.addCategory(categoryManager.getCategories().get("holz"));
         shopManager.registerShop(shop);
 

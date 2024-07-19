@@ -40,22 +40,27 @@ public class ShopSystemCommand extends BaseCommand {
     }
 
     @Subcommand("create shop")
-    @CommandCompletion("<id> @shop-type @nothing")
-    public void createShop(Player player, @Single String shopId, ShopFactory.ShopType shopType) {
-        var shop = new ShopFactory().createShop(shopId, shopType);
+    @CommandCompletion("<id> @shop-type <red>BeispielShop")
+    public void createShop(Player player, @Single String shopId, ShopFactory.ShopType shopType, String shopName) {
+        if (shopSystem.getShopManager().getShops().get(shopId) != null) {
+            player.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><red>Ein Shop mit der ID <id> existiert bereits!",
+                    Placeholder.parsed("id", shopId)));
+            return;
+        }
+        var shop = new ShopFactory().createShop(shopId, shopSystem.getMiniMessage().deserialize(shopName), shopType);
         shopSystem.getShopManager().registerShop(shop);
         player.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Der Shop <red><id></red> vom typ <yellow><type></yellow> wurde erstellt!",
                 Placeholder.parsed("id", shopId), Placeholder.parsed("type", shopType.name())));
     }
 
-    @Subcommand("create category")
-    @CommandCompletion("<id> @nothing")
-    public void createCategory(Player sender, @Single String categoryId) {
+    @Subcommand("create|setup category")
+    @CommandCompletion("@nothing")
+    public void createCategory(Player sender) {
         var setup = new CategorySetup(sender, shopSystem, new CategoryBuilder());
         setup.setOnComplete(category -> {
             shopSystem.getCategoryManager().registerCategory(category);
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><id></red> wurde erstellt!",
-                    Placeholder.unparsed("id", categoryId)));
+                    Placeholder.unparsed("id", category.getName())));
         });
         setup.register();
 

@@ -15,22 +15,24 @@ public class EnoughMoneyConditionChecker implements ConditionChecker {
     }
 
     @Override
-    public boolean checkBuy(Player player, ShopItem item) {
-        return false;
+    public boolean checkBuy(Player player, ShopItem item, int amount) {
+        Integer buyPrice = item.getBuyPrice();
+        if (buyPrice == null) return false;
+        return economyHandler.has(player.getUniqueId(), buyPrice * amount);
     }
 
     @Override
-    public boolean checkSell(Player player, ShopItem item) {
+    public boolean checkSell(Player player, ShopItem item, int amount) {
         return true;
     }
 
     @Override
-    public String getBuyFailureText(Player player, ShopItem item) {
-        return "Du hast nicht genügend Geld";
+    public String getBuyFailureText(Player player, ShopItem item, int amount) {
+        return "<red>Du hast nicht genügend Geld.";
     }
 
     @Override
-    public String getSellFailureText(Player player, ShopItem item) {
+    public String getSellFailureText(Player player, ShopItem item, int amount) {
         return "";
     }
 }

@@ -21,7 +21,7 @@ public interface ConditionChecker {
      * @param item   shop item that the player wants to sell
      * @return true if the player can sell the item, false otherwise
      */
-    boolean checkSell(Player player, ShopItem itemm, int amount);
+    boolean checkSell(Player player, ShopItem item, int amount);
 
     /**
      * @param player player who wants to buy the item

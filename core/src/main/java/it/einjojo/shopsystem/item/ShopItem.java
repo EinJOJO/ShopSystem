@@ -2,12 +2,12 @@ package it.einjojo.shopsystem.item;
 
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
-import it.einjojo.shopsystem.item.handler.ItemTradeException;
-import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
+import it.einjojo.shopsystem.item.handler.TradeHandler;
 import it.einjojo.shopsystem.util.Messages;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  */
 public class ShopItem {
     @NotNull
-    private final ItemTradeHandler itemTradeHandler;
+    private final TradeHandler tradeHandler;
     @NotNull
     private final List<ConditionChecker> conditionCheckerList = new LinkedList<>();
     @NotNull
@@ -38,8 +38,8 @@ public class ShopItem {
     @Nullable
     private Integer stock;
 
-    public ShopItem(@NotNull ItemTradeHandler itemTradeHandler, @NotNull ItemStack displayItemBase, @Nullable Integer buyPrice, @Nullable Integer sellPrice, @Nullable Integer stock, @NotNull Collection<ConditionChecker> conditionChecks) {
-        this.itemTradeHandler = itemTradeHandler;
+    public ShopItem(@NotNull TradeHandler tradeHandler, @NotNull ItemStack displayItemBase, @Nullable Integer buyPrice, @Nullable Integer sellPrice, @Nullable Integer stock, @NotNull Collection<ConditionChecker> conditionChecks) {
+        this.tradeHandler = tradeHandler;
         this.displayItemBase = displayItemBase;
         this.buyPrice = buyPrice;
         this.sellPrice = sellPrice;
@@ -121,8 +121,8 @@ public class ShopItem {
         this.observer = observer;
     }
 
-    public ItemTradeHandler getItem() {
-        return itemTradeHandler;
+    public TradeHandler getItem() {
+        return tradeHandler;
     }
 
     public ItemStack getDisplayItem() {
@@ -173,9 +173,13 @@ public class ShopItem {
      * @param plugin ShopSystemPlugin
      * @param amount Amount of items to buy
      * @return true if the item was bought successfully
-     * @throws ItemTradeException if the item could not be bought because of weird reasons
+     * @throws ItemTradeException    if the item could not be bought because of weird reasons
+     * @throws IllegalStateException if the method is not called from the main thread
      */
     public boolean buy(Player buyer, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("buy() must be called from the main thread");
+        }
         if (buyPrice == null) {
             throw new ItemTradeException("Artikel kann nicht gekauft werden.");
         }
@@ -244,13 +248,18 @@ public class ShopItem {
         withObserver(observer -> observer.onConditionChange(this));
     }
 
-    public @NotNull ItemTradeHandler getItemTradeHandler() {
-        return itemTradeHandler;
+    public @NotNull TradeHandler getItemTradeHandler() {
+        return tradeHandler;
     }
 
 
+    /**
+     * A clone of the base item
+     *
+     * @return ItemStack
+     */
     public @NotNull ItemStack getDisplayItemBase() {
-        return displayItemBase;
+        return displayItemBase.clone();
     }
 
     public @Nullable ShopItemObserver getObserver() {
@@ -272,18 +281,18 @@ public class ShopItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ShopItem shopItem = (ShopItem) o;
-        return Objects.equals(itemTradeHandler, shopItem.itemTradeHandler) && Objects.equals(conditionCheckerList, shopItem.conditionCheckerList) && Objects.equals(displayItemBase, shopItem.displayItemBase) && Objects.equals(displayItemCached, shopItem.displayItemCached) && Objects.equals(buyPrice, shopItem.buyPrice) && Objects.equals(sellPrice, shopItem.sellPrice) && Objects.equals(observer, shopItem.observer) && Objects.equals(stock, shopItem.stock);
+        return Objects.equals(tradeHandler, shopItem.tradeHandler) && Objects.equals(conditionCheckerList, shopItem.conditionCheckerList) && Objects.equals(displayItemBase, shopItem.displayItemBase) && Objects.equals(displayItemCached, shopItem.displayItemCached) && Objects.equals(buyPrice, shopItem.buyPrice) && Objects.equals(sellPrice, shopItem.sellPrice) && Objects.equals(observer, shopItem.observer) && Objects.equals(stock, shopItem.stock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemTradeHandler, conditionCheckerList, displayItemBase, displayItemCached, buyPrice, sellPrice, observer, stock);
+        return Objects.hash(tradeHandler, conditionCheckerList, displayItemBase, displayItemCached, buyPrice, sellPrice, observer, stock);
     }
 
     @Override
     public String toString() {
         return "ShopItem{" +
-                "itemTradeHandler=" + itemTradeHandler.getClass().getSimpleName() +
+                "itemTradeHandler=" + tradeHandler.getClass().getSimpleName() +
                 ", conditions=" + conditionCheckerList.size() +
                 ", displayItemBase=" + displayItemBase.getType().name() +
                 ", buyPrice=" + buyPrice +

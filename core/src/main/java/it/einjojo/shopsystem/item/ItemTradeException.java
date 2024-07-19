@@ -1,4 +1,4 @@
-package it.einjojo.shopsystem.item.handler;
+package it.einjojo.shopsystem.item;
 
 /**
  * The reason will be displayed to the user when the trade fails

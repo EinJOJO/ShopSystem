@@ -16,8 +16,13 @@ import java.util.List;
 public class CategorizedShop implements Shop {
     private final List<Category> categories = new LinkedList<>();
     private final String id;
-    private @Nullable ShopChangeObserver observer;
+    private final Component shopName;
+    private @Nullable ShopObserver observer;
 
+    public CategorizedShop(String id, Component shopName) {
+        this.shopName = shopName;
+        this.id = id;
+    }
 
     @Override
     public void openBuy(Player player) {
@@ -43,18 +48,15 @@ public class CategorizedShop implements Shop {
 
 
     @Override
-    public @Nullable ShopChangeObserver getObserver() {
+    public @Nullable ShopObserver getObserver() {
         return observer;
     }
 
     @Override
-    public void setObserver(@Nullable ShopChangeObserver observer) {
+    public void setObserver(@Nullable ShopObserver observer) {
         this.observer = observer;
     }
 
-    public CategorizedShop(String id) {
-        this.id = id;
-    }
 
     @Override
     public String getId() {
@@ -63,7 +65,7 @@ public class CategorizedShop implements Shop {
 
     @Override
     public Component getShopGuiTitle() {
-        return Component.text("Shop");
+        return shopName;
     }
 
 

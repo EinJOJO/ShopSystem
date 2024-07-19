@@ -2,8 +2,7 @@ package it.einjojo.shopsystem.gui;
 
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.item.ShopItem;
-import it.einjojo.shopsystem.item.handler.ItemTradeException;
-import it.einjojo.shopsystem.shop.Shop;
+import it.einjojo.shopsystem.item.ItemTradeException;
 import mc.obliviate.inventory.Icon;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Sound;

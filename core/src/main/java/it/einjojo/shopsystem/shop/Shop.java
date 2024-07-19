@@ -27,12 +27,12 @@ public interface Shop {
     void openSell(Player player);
 
     @Nullable
-    ShopChangeObserver getObserver();
+    ShopObserver getObserver();
 
-    void setObserver(@Nullable ShopChangeObserver observer);
+    void setObserver(@Nullable ShopObserver observer);
 
     default void callChangeObserver() {
-        ShopChangeObserver observer = getObserver();
+        ShopObserver observer = getObserver();
         if (observer != null) {
             observer.onShopChange(this);
         }

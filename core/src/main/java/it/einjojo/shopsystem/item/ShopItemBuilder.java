@@ -3,7 +3,7 @@ package it.einjojo.shopsystem.item;
 import com.google.common.base.Preconditions;
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
 import it.einjojo.shopsystem.item.handler.ItemStackTradeHandler;
-import it.einjojo.shopsystem.item.handler.ItemTradeHandler;
+import it.einjojo.shopsystem.item.handler.TradeHandler;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ShopItemBuilder {
     private static final ItemStack NO_DISPLAY_ITEM = new ItemStack(Material.PAPER);
     private final List<ConditionChecker> conditionCheckerList = new LinkedList<>();
-    private ItemTradeHandler itemTradeHandler;
+    private TradeHandler tradeHandler;
     private ItemStack displayItem = NO_DISPLAY_ITEM;
     private Integer buyPrice;
     private Integer sellPrice;
@@ -29,7 +29,7 @@ public class ShopItemBuilder {
     }
 
     public ShopItemBuilder(ShopItem shopItem) {
-        this.itemTradeHandler = shopItem.getItemTradeHandler();
+        this.tradeHandler = shopItem.getItemTradeHandler();
         this.displayItem = shopItem.getDisplayItem();
         this.buyPrice = shopItem.getBuyPrice();
         this.sellPrice = shopItem.getSellPrice();
@@ -38,8 +38,8 @@ public class ShopItemBuilder {
         this.conditionCheckerList.addAll(shopItem.getConditionList());
     }
 
-    public ShopItemBuilder itemTradeHandler(ItemTradeHandler itemTradeHandler) {
-        this.itemTradeHandler = itemTradeHandler;
+    public ShopItemBuilder itemTradeHandler(TradeHandler tradeHandler) {
+        this.tradeHandler = tradeHandler;
         return this;
     }
 
@@ -98,7 +98,7 @@ public class ShopItemBuilder {
     }
 
     public ShopItem build() {
-        var shopItem = new ShopItem(itemTradeHandler, displayItem, buyPrice, sellPrice, stock, conditionCheckerList);
+        var shopItem = new ShopItem(tradeHandler, displayItem, buyPrice, sellPrice, stock, conditionCheckerList);
         shopItem.setObserver(observer);
         return shopItem;
     }

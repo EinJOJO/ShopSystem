@@ -1,8 +1,12 @@
 package it.einjojo.shopsystem.item.handler;
 
+import it.einjojo.shopsystem.item.ItemTradeException;
 import org.bukkit.entity.Player;
 
-public interface ItemTradeHandler {
+/**
+ *
+ */
+public interface TradeHandler {
 
     /**
      * Executed when the player has purchased an item successfully.
