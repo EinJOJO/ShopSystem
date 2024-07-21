@@ -26,7 +26,6 @@ public abstract class AbstractSetup<T> implements Listener {
     private final UUID playerUuid;
     protected final Player player;
 
-
     protected AbstractSetup(ShopSystemPlugin plugin, Player player) {
         this.plugin = plugin;
         this.playerUuid = player.getUniqueId();
@@ -69,6 +68,7 @@ public abstract class AbstractSetup<T> implements Listener {
         return playerUuid;
     }
 
+
     public void unregister() {
         HandlerList.unregisterAll(this);
         SETUP_MAP.remove(playerUuid);
@@ -79,4 +79,7 @@ public abstract class AbstractSetup<T> implements Listener {
         return plugin;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
 }
