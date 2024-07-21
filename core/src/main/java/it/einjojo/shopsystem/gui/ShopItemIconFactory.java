@@ -33,13 +33,13 @@ public interface ShopItemIconFactory {
                         Player player = (Player) clickEvent.getWhoClicked();
                         try {
                             playActionSound(
-                                    shopItem.buy(player, plugin, 1),
+                                    shopItem.sell(player, plugin, 1),
                                     player
                             );
                         } catch (ItemTradeException e) {
                             playActionSound(false, player);
                             player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Kauf konnte nicht durchgeührt werden: <reason>",
-                                    Placeholder.unparsed("reason", e.getReason())));
+                                    Placeholder.unparsed("reason", e.getReason().name())));
                         }
                     });
         }
@@ -55,13 +55,13 @@ public interface ShopItemIconFactory {
                         Player player = (Player) clickEvent.getWhoClicked();
                         try {
                             playActionSound(
-                                    shopItem.sell(player, plugin, 1),
+                                    shopItem.buy(player, plugin, 1),
                                     player
                             );
                         } catch (ItemTradeException e) {
                             playActionSound(false, player);
                             player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Verkauf konnte nicht durchgeührt werden: <reason>",
-                                    Placeholder.unparsed("reason", e.getReason())));
+                                    Placeholder.unparsed("reason", e.getReason().name())));
                         }
                     });
         }

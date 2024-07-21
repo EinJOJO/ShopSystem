@@ -181,7 +181,7 @@ public class ShopItem {
             throw new IllegalStateException("buy() must be called from the main thread");
         }
         if (buyPrice == null) {
-            throw new ItemTradeException("Artikel kann nicht gekauft werden.");
+            throw new ItemTradeException(ItemTradeException.Reason.ARTICLE_NOT_BUYABLE);
         }
         ConditionChecker failed = checkBuyCondition(buyer, amount);
         if (failed != null) {
@@ -198,8 +198,11 @@ public class ShopItem {
     }
 
     public boolean sell(Player player, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("sell() must be called from the main thread");
+        }
         if (sellPrice == null) {
-            throw new ItemTradeException("Artikel kann nicht verkauft werden.");
+            throw new ItemTradeException(ItemTradeException.Reason.ARTICLE_NOT_SELLABLE);
         }
         ConditionChecker failed = checkSellCondition(player, amount);
         if (failed != null) {

@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ShopSystemPlugin extends JavaPlugin {
     private static volatile ShopSystemPlugin instance;
@@ -79,7 +80,6 @@ public class ShopSystemPlugin extends JavaPlugin {
                         new ShopItemBuilder()
                                 .withItemStack(new ItemStack(Material.COOKED_COD))
                                 .buyPrice(20)
-                                .sellPrice(10)
                                 .build()))
                 .name("fisch")
                 .displayName(Component.text("Fisch", NamedTextColor.RED))
@@ -88,12 +88,14 @@ public class ShopSystemPlugin extends JavaPlugin {
                 .build());
         var shop = new CategorizedShop("testshop", Component.text("TEST", NamedTextColor.RED));
         shop.addCategory(categoryManager.getCategories().get("holz"));
+        shop.addCategory(categoryManager.getCategories().get("fisch"));
         shopManager.registerShop(shop);
 
     }
 
     private void registerCommands() {
         var paperManager = new PaperCommandManager(this);
+        paperManager.getLocales().setDefaultLocale(Locale.GERMAN);
         new ShopSystemCommand(this, paperManager);
     }
 
@@ -115,7 +117,8 @@ public class ShopSystemPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        instance = null;
+        getSLF4JLogger().info("goodbye!!");
     }
 
     public EconomyHandler getEconomyHandler() {

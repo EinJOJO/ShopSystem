@@ -53,6 +53,17 @@ tasks {
     }
 
 
+    register("copyToTestserver") {
+        dependsOn("shadowJar")
+        doLast {
+            copy {
+                from("build/libs/ShopSystem.jar")
+                into("../run/plugins")
+            }
+        }
+
+    }
+
     shadowJar {
         dependsOn(project.project(":platforms").subprojects.map {
             it.tasks.named("assemble")

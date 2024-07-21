@@ -4,21 +4,38 @@ package it.einjojo.shopsystem.item;
  * The reason will be displayed to the user when the trade fails
  */
 public class ItemTradeException extends Exception {
-    private final String reason;
+    private final Reason reason;
 
+    @Deprecated
     public ItemTradeException(String reason) {
+        super(reason);
+        this.reason = Reason.UNKNOWN;
+    }
+
+    public ItemTradeException(Reason reason) {
+        super(reason.name());
         this.reason = reason;
     }
 
     public ItemTradeException(Throwable cause) {
         super(cause);
-        this.reason = cause.getMessage();
+        this.reason = Reason.EXCEPTION;
     }
 
 
-    public String getReason() {
+    public Reason getReason() {
         return reason;
+
     }
 
+
+    public enum Reason {
+        ARTICLE_NOT_SELLABLE,
+        ARTICLE_NOT_BUYABLE,
+        ITEM_REMOVAL_FAILED,
+        EXCEPTION,
+        UNKNOWN
+
+    }
 
 }
