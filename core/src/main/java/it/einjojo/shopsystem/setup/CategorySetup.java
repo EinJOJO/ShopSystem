@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -44,7 +45,15 @@ public class CategorySetup extends AbstractSetup<Category> {
     @Override
     protected void complete() {
         unregister();
-        callCompletionConsumer(null);
+        Category buildResult;
+        try {
+            buildResult = categoryBuilder.build();
+        } catch (Exception exception) {
+            sendMessage("<red>Ein Fehler ist aufgreten: <ex>", Placeholder.unparsed("ex", exception.getMessage()));
+            throw exception;
+        }
+        sendMessage("<green>Setup abgeschlossen.");
+        callCompletionConsumer(buildResult);
     }
 
     public void sendMessage(String message, TagResolver... resolvers) {
@@ -62,30 +71,45 @@ public class CategorySetup extends AbstractSetup<Category> {
     @EventHandler
     public void onChat(AsyncChatEvent event) {
         if (event.getPlayer().getUniqueId().equals(player.getUniqueId())) {
-            event.setCancelled(true);
             String message = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
             if (message.equalsIgnoreCase("cancel")) {
                 unregister();
+                event.setCancelled(true);
                 sendMessage("<red>Setup abgebrochen.");
                 return;
             }
-            current.handleChatInput(this, message);
+            if (current.handleChatInput(this, message)) {
+                event.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent dropItemEvent) {
         if (dropItemEvent.getPlayer().getUniqueId().equals(player.getUniqueId())) {
-            dropItemEvent.setCancelled(true);
-            current.handleItemDrop(this, dropItemEvent.getItemDrop().getItemStack());
+            if (current.handleItemDrop(this, dropItemEvent.getItemDrop().getItemStack())) {
+                dropItemEvent.setCancelled(true);
+            };
         }
     }
 
     private interface CategorySetupStage extends SetupStage<CategorySetup> {
-        default void handleChatInput(CategorySetup setup, String input) {
+        /**
+         * @param setup setup instance
+         * @param input player message
+         * @return true if the event should be cancelled
+         */
+        default boolean handleChatInput(CategorySetup setup, String input) {
+            return false;
         }
 
-        default void handleItemDrop(CategorySetup setup, ItemStack dropped) {
+        /**
+         * @param setup   setup instance
+         * @param dropped item that the player dropped
+         * @return if the event should be cancelled
+         */
+        default boolean handleItemDrop(CategorySetup setup, ItemStack dropped) {
+            return false;
         }
     }
 
@@ -97,13 +121,15 @@ public class CategorySetup extends AbstractSetup<Category> {
                 s.sendMessage("<red>1<gray> - Anzeigenamen ändern");
                 s.sendMessage("<red>2<gray> - Beschreibung ändern");
                 s.sendMessage("<red>3<gray> - Material ändern");
-                s.sendMessage("<red>4<gray> - Items hinzufügen");
+                s.sendMessage("<red>4<gray> - Existierende Items hinzufügen");
                 s.sendMessage("<red>5<gray> - Items entfernen");
-                s.sendMessage("<red>6<gray> - Beenden");
+                s.sendMessage("<red>6<gray> - Item erstellen");
+                s.sendMessage("<red>0<gray> - Beenden");
                 s.sendMessage("<red>Gib die Nummer ein, um fortzufahren");
             }
 
-            public void handleChatInput(String input, CategorySetup setup) {
+            @Override
+            public boolean handleChatInput(CategorySetup setup, String input) {
                 switch (input) {
                     case "1":
                         setup.setCurrentAndPrompt(NAME);
@@ -115,18 +141,23 @@ public class CategorySetup extends AbstractSetup<Category> {
                         setup.setCurrentAndPrompt(MATERIAL);
                         break;
                     case "4":
+                        //TODO open select gui
                         setup.setCurrentAndPrompt(new ShopItemSetupStage(setup));
                         break;
                     case "5":
                         setup.setCurrentAndPrompt(ITEM_REMOVE);
                         break;
                     case "6":
+                        // TODO START ITEM SETUP
+                        break;
+                    case "0":
                         setup.complete();
                         break;
                     default:
                         setup.sendMessage("<red>Ungültige Eingabe.");
                         prompt(setup);
                 }
+                return true;
             }
         },
         NAME {
@@ -137,9 +168,10 @@ public class CategorySetup extends AbstractSetup<Category> {
             }
 
             @Override
-            public void handleChatInput(CategorySetup setup, String input) {
+            public boolean handleChatInput(CategorySetup setup, String input) {
                 setup.categoryBuilder.displayName(setup.getPlugin().getMiniMessage().deserialize(input));
                 setup.predicateOrActionSelect(builder -> builder.getDescription() == null, MATERIAL);
+                return true;
             }
         },
         DESCRIPTION {
@@ -150,9 +182,10 @@ public class CategorySetup extends AbstractSetup<Category> {
             }
 
             @Override
-            public void handleChatInput(CategorySetup setup, String input) {
+            public boolean handleChatInput(CategorySetup setup, String input) {
                 setup.categoryBuilder.description(input);
                 setup.predicateOrActionSelect(builder -> builder.getDisplayMaterial() == null, MATERIAL);
+                return true;
             }
         },
         MATERIAL {
@@ -162,21 +195,49 @@ public class CategorySetup extends AbstractSetup<Category> {
             }
 
             @Override
-            public void handleItemDrop(CategorySetup setup, ItemStack dropped) {
+            public boolean handleItemDrop(CategorySetup setup, ItemStack dropped) {
                 setup.categoryBuilder.displayMaterial(dropped.getType());
                 setup.setCurrentAndPrompt(ACTION_SELECT);
+                return true;
+            }
+        },
+        ITEM_EXISTING_ADD {
+            @Override
+            public void prompt(CategorySetup setup) {
+                //TODO open select gui
             }
         },
         ITEM_REMOVE {
             @Override
             public void prompt(CategorySetup setup) {
                 List<ShopItem> itemList = setup.categoryBuilder.getItemList();
-                int i = 0;
+                int i = 1;
                 for (ShopItem item : itemList) {
                     setup.sendMessage("<red><index><gray> - <dark_gray><item>",
-                            Placeholder.unparsed("index", String.valueOf(i + 1)),
-                            Placeholder.unparsed("item", item.toString()));
+                            Placeholder.unparsed("index", String.valueOf(i++)),
+                            Placeholder.unparsed("item", item.toString())); //TODO NBT API String representation
                 }
+                setup.sendMessage("<yellow>Gib den Index an, um das Item zu entfernen.");
+            }
+
+            @Override
+            public boolean handleChatInput(CategorySetup setup, String input) {
+                try {
+                    int index = Integer.parseInt(input) - 1;
+                    List<ShopItem> items = new ArrayList<>(setup.categoryBuilder.getItemList());
+                    if (index < 0 || index >= items.size()) {
+                        setup.sendMessage("<red>Ungültiger Wertebereich. Versuche es nochmal!");
+                        return true;
+                    }
+                    items.remove(index);
+                    setup.sendMessage("<gray>Das <hover:show_text:'<gray><item-string></gray>'>Item</hover> <red><index></red> wurde entfernt",
+                            Placeholder.unparsed("item-string", ""),
+                            Placeholder.unparsed("index", String.valueOf(index + 1)));
+                    setup.setCurrentAndPrompt(Stage.ACTION_SELECT);
+                } catch (NumberFormatException ex) {
+                    setup.sendMessage("<red>Gib eine Zahl an.");
+                }
+                return true;
             }
         }
     }
@@ -204,7 +265,7 @@ public class CategorySetup extends AbstractSetup<Category> {
     }
 
 
-    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, CategorySetupStage setupStage) {
+    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, CategorySetupStage  setupStage) {
         if (setupPredicate.test(this.categoryBuilder)) {
             setCurrentAndPrompt(setupStage);
         } else {
