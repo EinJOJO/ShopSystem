@@ -28,7 +28,7 @@ public class CategorizedShopGui extends ShopSystemGui {
         this.plugin = plugin;
         if (shop.getCategories().isEmpty()) {
             player.sendMessage("§cDer Shop besitzt keine Kateogrien!");
-            throw new IllegalArgumentException("Shop has no categories.");
+            throw new IllegalArgumentException("Shop " + shop.getId() + "  has no categories and can not be opened.");
         }
         categoriesPagination.registerPageSlotsBetween(9 * 4 + 1, 9 * 4 + 7);
         itemsPagination.registerPageSlotsBetween(0, 9 * 3 - 1);
@@ -61,7 +61,6 @@ public class CategorizedShopGui extends ShopSystemGui {
                 .onClick((clickEvent) -> {
                     categoriesPagination.goNextPage();
                 });
-
         addItem(9 * 4, prevCategories);
         addItem(9 * 5 - 1, nextCategories);
 

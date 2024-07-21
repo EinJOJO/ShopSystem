@@ -40,10 +40,19 @@ public interface ShopItemIconFactory {
                             playActionSound(false, player);
                             player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Kauf konnte nicht durchgeührt werden: <reason>",
                                     Placeholder.unparsed("reason", e.getReason().name())));
+                            ShopItemIconFactory.handleTradeException(e);
                         }
                     });
         }
     }
+
+    private static void handleTradeException(ItemTradeException exception) {
+        if (exception.getReason().equals(ItemTradeException.Reason.EXCEPTION)) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+
 
     class BuyOnly implements ShopItemIconFactory {
 
@@ -62,7 +71,9 @@ public interface ShopItemIconFactory {
                             playActionSound(false, player);
                             player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Verkauf konnte nicht durchgeührt werden: <reason>",
                                     Placeholder.unparsed("reason", e.getReason().name())));
+                            ShopItemIconFactory.handleTradeException(e);
                         }
+
                     });
         }
     }
