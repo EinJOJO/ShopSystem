@@ -5,6 +5,7 @@ import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.category.Category;
 import it.einjojo.shopsystem.category.CategoryBuilder;
 import it.einjojo.shopsystem.item.ShopItem;
+import it.einjojo.shopsystem.item.ShopItemBuilder;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -248,7 +249,7 @@ public class CategorySetup extends AbstractSetup<Category> {
 
         public ShopItemSetupStage(CategorySetup parent) {
             this.parent = parent;
-            itemSetup = new ShopItemSetup(parent.getPlugin(), Bukkit.getPlayer(parent.getPlayerUuid()));
+            itemSetup = new ShopItemSetup(parent.getPlugin(), Bukkit.getPlayer(parent.getPlayerUuid()), new ShopItemBuilder());
             itemSetup.setOnComplete((shopitem) -> {
                 parent.categoryBuilder.addItem(shopitem);
                 parent.current = Stage.ACTION_SELECT;

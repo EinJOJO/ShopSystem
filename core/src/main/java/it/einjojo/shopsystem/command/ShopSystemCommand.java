@@ -22,10 +22,10 @@ public class ShopSystemCommand extends BaseCommand {
     private final ShopSystemPlugin shopSystem;
 
     public ShopSystemCommand(ShopSystemPlugin shopSystem, PaperCommandManager commandManager) {
-        commandManager.getCommandCompletions().registerStaticCompletion("shop-type", Arrays.stream(ShopFactory.ShopType.values()).map(Enum::name).toList());
-        commandManager.getCommandContexts().registerContext(ShopFactory.ShopType.class, context -> {
-            return ShopFactory.ShopType.valueOf(context.popFirstArg());
-        });
+        //commandManager.getCommandCompletions().registerStaticCompletion("shop-type", Arrays.stream(ShopFactory.ShopType.values()).map(Enum::name).toList());
+        //commandManager.getCommandContexts().registerContext(ShopFactory.ShopType.class, context -> {
+        //    return ShopFactory.ShopType.valueOf(context.popFirstArg());
+        //});
         commandManager.getCommandCompletions().registerAsyncCompletion("category", (c) -> shopSystem.getCategoryManager().getCategories().keySet());
         commandManager.getCommandContexts().registerContext(Category.class, context -> {
             return Optional.ofNullable(shopSystem.getCategoryManager().getCategories().get(context.popFirstArg())).orElseThrow();
@@ -33,8 +33,8 @@ public class ShopSystemCommand extends BaseCommand {
         commandManager.getCommandCompletions().registerAsyncCompletion("shop", (c) -> shopSystem.getShopManager().getShops().keySet());
         commandManager.getCommandContexts().registerContext(Shop.class, context ->
                 Optional.ofNullable(shopSystem.getShopManager().getShops().get(context.popFirstArg())).orElseThrow());
-
-
+        commandManager.getCommandCompletions().setDefaultCompletion("category", Category.class);
+        commandManager.getCommandCompletions().setDefaultCompletion("shop", Shop.class);
         commandManager.registerCommand(this);
         this.shopSystem = shopSystem;
     }

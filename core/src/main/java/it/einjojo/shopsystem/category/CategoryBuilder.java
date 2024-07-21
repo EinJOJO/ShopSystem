@@ -28,7 +28,7 @@ public class CategoryBuilder {
     }
 
     public CategoryBuilder addItems(Collection<ShopItem> itemList) {
-        this.itemList.addAll(itemList);
+       this.itemList.addAll(itemList);
         return this;
     }
 
