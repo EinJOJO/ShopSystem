@@ -97,6 +97,34 @@ public class ShopItemBuilder {
         return this;
     }
 
+    public List<ConditionChecker> getConditionCheckerList() {
+        return conditionCheckerList;
+    }
+
+    public TradeHandler getTradeHandler() {
+        return tradeHandler;
+    }
+
+    public ItemStack getDisplayItem() {
+        return displayItem;
+    }
+
+    public Integer getBuyPrice() {
+        return buyPrice;
+    }
+
+    public Integer getSellPrice() {
+        return sellPrice;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public ShopItemObserver getObserver() {
+        return observer;
+    }
+
     public ShopItem build() {
         var shopItem = new ShopItem(tradeHandler, displayItem, buyPrice, sellPrice, stock, conditionCheckerList);
         shopItem.setObserver(observer);

@@ -1,6 +1,7 @@
 package it.einjojo.shopsystem.setup;
 
 import it.einjojo.shopsystem.ShopSystemPlugin;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -52,6 +53,11 @@ public abstract class AbstractSetup<T> implements Listener {
 
     protected abstract void complete();
 
+    protected void sendMessage(String miniMessage, TagResolver... resolver) {
+        getPlayer().sendMessage(getPlugin().getMiniMessage().deserialize(getMessagePrefix() + miniMessage, resolver));
+    }
+
+    protected abstract String getMessagePrefix();
 
     public void setOnComplete(@Nullable Consumer<T> onComplete) {
         this.onComplete = onComplete;
@@ -63,6 +69,14 @@ public abstract class AbstractSetup<T> implements Listener {
         }
     }
 
+    protected boolean checkCancel(String message) {
+        if (message.equalsIgnoreCase("cancel")) {
+            unregister();
+            sendMessage("<red>Setup abgebrochen.");
+            return true;
+        }
+        return false;
+    }
 
     public UUID getPlayerUuid() {
         return playerUuid;

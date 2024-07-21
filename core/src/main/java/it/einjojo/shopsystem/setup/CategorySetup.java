@@ -57,9 +57,9 @@ public class CategorySetup extends AbstractSetup<Category> {
         callCompletionConsumer(buildResult);
     }
 
-    public void sendMessage(String message, TagResolver... resolvers) {
-        player.sendMessage(getPlugin().getMiniMessage().deserialize(
-                "<dark_gray>[<red>Category-Setup</red>]</dark_gray> <gray>" + message, resolvers));
+    @Override
+    protected String getMessagePrefix() {
+        return "<dark_gray>[<red>Category-Setup</red>] <gray>";
     }
 
     @Override
@@ -73,12 +73,7 @@ public class CategorySetup extends AbstractSetup<Category> {
     public void onChat(AsyncChatEvent event) {
         if (event.getPlayer().getUniqueId().equals(player.getUniqueId())) {
             String message = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
-            if (message.equalsIgnoreCase("cancel")) {
-                unregister();
-                event.setCancelled(true);
-                sendMessage("<red>Setup abgebrochen.");
-                return;
-            }
+            if (checkCancel(message)) return;
             if (current.handleChatInput(this, message)) {
                 event.setCancelled(true);
             }
@@ -90,7 +85,8 @@ public class CategorySetup extends AbstractSetup<Category> {
         if (dropItemEvent.getPlayer().getUniqueId().equals(player.getUniqueId())) {
             if (current.handleItemDrop(this, dropItemEvent.getItemDrop().getItemStack())) {
                 dropItemEvent.setCancelled(true);
-            };
+            }
+            ;
         }
     }
 

@@ -95,7 +95,7 @@ public class ShopSystemCommand extends BaseCommand {
 
 
     @Subcommand("open")
-    @CommandCompletion("@shop")
+    @CommandCompletion("@shop sell|buy")
     public void openShop(Player sender, Shop shop, @Values("sell|buy") String type) {
         try {
             if (type.equalsIgnoreCase("sell")) {
