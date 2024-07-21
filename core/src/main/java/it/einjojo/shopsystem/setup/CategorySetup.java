@@ -265,7 +265,7 @@ public class CategorySetup extends AbstractSetup<Category> {
     }
 
 
-    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, CategorySetupStage  setupStage) {
+    private void predicateOrActionSelect(Predicate<CategoryBuilder> setupPredicate, CategorySetupStage setupStage) {
         if (setupPredicate.test(this.categoryBuilder)) {
             setCurrentAndPrompt(setupStage);
         } else {
