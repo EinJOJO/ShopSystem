@@ -14,14 +14,14 @@ public class CategoryManager {
     }
 
     public void registerCategory(Category category) {
-        Category replaced = categories.put(category.getName(), category);
+        Category replaced = categories.put(category.getInternalName(), category);
         if (replaced != null) {
             listeners.forEach(listener -> listener.onUpdate(replaced, category));
         }
     }
 
     public void unregisterCategory(Category category) {
-        categories.remove(category.getName());
+        categories.remove(category.getInternalName());
     }
 
     public void subscribe(CategoryListener listener) {

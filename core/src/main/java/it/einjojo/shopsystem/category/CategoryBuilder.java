@@ -12,23 +12,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CategoryBuilder {
-    private String name;
+    private String internalName;
     private @NotNull List<ShopItem> itemList = new LinkedList<>();
     private Component displayName;
     private String description;
     private Material displayMaterial;
 
     public CategoryBuilder() {
-        defaults();
     }
 
-    public CategoryBuilder name(String name) {
-        this.name = name;
+    public CategoryBuilder internalName(String internalName) {
+        this.internalName = internalName;
         return this;
     }
 
     public CategoryBuilder addItems(Collection<ShopItem> itemList) {
-       this.itemList.addAll(itemList);
+        this.itemList.addAll(itemList);
         return this;
     }
 
@@ -64,8 +63,8 @@ public class CategoryBuilder {
         return this;
     }
 
-    public @Nullable String getName() {
-        return name;
+    public @Nullable String getInternalName() {
+        return internalName;
     }
 
     public @NotNull List<ShopItem> getItemList() {
@@ -94,11 +93,11 @@ public class CategoryBuilder {
     }
 
     public boolean isComplete() {
-        return name != null;
+        return internalName != null;
     }
 
 
     public Category build() {
-        return new Category(name, itemList, displayName, description, displayMaterial);
+        return new Category(internalName, itemList, displayName, description, displayMaterial);
     }
 }

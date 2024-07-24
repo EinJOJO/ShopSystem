@@ -66,7 +66,7 @@ public class ShopSystemPlugin extends JavaPlugin {
                                 .buyPrice(20)
                                 .sellPrice(10)
                                 .build()))
-                .name("holz")
+                .internalName("holz")
                 .displayName(Component.text("Holz", NamedTextColor.RED))
                 .description("Stuff.")
                 .displayMaterial(Material.OAK_PLANKS)
@@ -81,10 +81,10 @@ public class ShopSystemPlugin extends JavaPlugin {
                                 .withItemStack(new ItemStack(Material.COOKED_COD))
                                 .buyPrice(20)
                                 .build()))
-                .name("fisch")
+                .internalName("fisch")
                 .displayName(Component.text("Fisch", NamedTextColor.RED))
                 .description("Stuff.")
-                .displayMaterial(Material.OAK_PLANKS)
+                .displayMaterial(Material.FISHING_ROD)
                 .build());
         var shop = new CategorizedShop("testshop", Component.text("TEST", NamedTextColor.RED));
         shop.addCategory(categoryManager.getCategories().get("holz"));

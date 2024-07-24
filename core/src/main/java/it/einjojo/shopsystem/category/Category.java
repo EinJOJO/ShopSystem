@@ -14,19 +14,19 @@ import java.util.function.Consumer;
  * A category is a collection of items that can be bought and sold in a shop.
  */
 public class Category implements Iterable<ShopItem> {
-    private final @NotNull String name;
+    private final @NotNull String internalName;
     private final @NotNull Component displayName;
     private final @NotNull String description;
     private final @NotNull Material displayMaterial;
     private final @NotNull List<ShopItem> items = new LinkedList<>();
 
 
-    public Category(@NotNull String name, @Nullable Collection<ShopItem> itemList, @NotNull Component displayName, @NotNull String description, @NotNull Material displayMaterial) {
-        Preconditions.checkNotNull(name);
+    public Category(@NotNull String internalName, @Nullable Collection<ShopItem> itemList, @NotNull Component displayName, @NotNull String description, @NotNull Material displayMaterial) {
+        Preconditions.checkNotNull(internalName);
         Preconditions.checkNotNull(displayName);
         Preconditions.checkNotNull(description);
         Preconditions.checkNotNull(displayMaterial);
-        this.name = name;
+        this.internalName = internalName;
         this.displayName = displayName;
         this.description = description;
         this.displayMaterial = displayMaterial;
@@ -42,7 +42,7 @@ public class Category implements Iterable<ShopItem> {
 
     public CategoryBuilder builder() {
         return new CategoryBuilder()
-                .name(name)
+                .internalName(internalName)
                 .setItemList(items)
                 .displayName(displayName)
                 .description(description)
@@ -64,8 +64,8 @@ public class Category implements Iterable<ShopItem> {
         return items.remove(item);
     }
 
-    public @NotNull String getName() {
-        return name;
+    public @NotNull String getInternalName() {
+        return internalName;
     }
 
 

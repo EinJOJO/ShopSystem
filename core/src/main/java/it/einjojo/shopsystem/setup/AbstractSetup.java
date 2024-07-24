@@ -1,6 +1,7 @@
 package it.einjojo.shopsystem.setup;
 
 import it.einjojo.shopsystem.ShopSystemPlugin;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -67,6 +68,10 @@ public abstract class AbstractSetup<T> implements Listener {
         if (onComplete != null) {
             onComplete.accept(object);
         }
+    }
+
+    protected void confirmInput(String input) {
+        sendMessage("<dark_gray>➥ <yellow><input> <green>✔", Placeholder.parsed("input", input));
     }
 
     protected boolean checkCancel(String message) {

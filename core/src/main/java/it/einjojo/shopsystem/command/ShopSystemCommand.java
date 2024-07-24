@@ -22,10 +22,10 @@ public class ShopSystemCommand extends BaseCommand {
     private final ShopSystemPlugin shopSystem;
 
     public ShopSystemCommand(ShopSystemPlugin shopSystem, PaperCommandManager commandManager) {
-        //commandManager.getCommandCompletions().registerStaticCompletion("shop-type", Arrays.stream(ShopFactory.ShopType.values()).map(Enum::name).toList());
-        //commandManager.getCommandContexts().registerContext(ShopFactory.ShopType.class, context -> {
-        //    return ShopFactory.ShopType.valueOf(context.popFirstArg());
-        //});
+        commandManager.getCommandCompletions().registerStaticCompletion("shop-type", Arrays.stream(ShopFactory.ShopType.values()).map(Enum::name).toList());
+        commandManager.getCommandContexts().registerContext(ShopFactory.ShopType.class, context -> {
+            return ShopFactory.ShopType.valueOf(context.popFirstArg());
+        });
         commandManager.getCommandCompletions().registerAsyncCompletion("category", (c) -> shopSystem.getCategoryManager().getCategories().keySet());
         commandManager.getCommandContexts().registerContext(Category.class, context -> {
             return Optional.ofNullable(shopSystem.getCategoryManager().getCategories().get(context.popFirstArg())).orElseThrow();
@@ -60,7 +60,7 @@ public class ShopSystemCommand extends BaseCommand {
         setup.setOnComplete(category -> {
             shopSystem.getCategoryManager().registerCategory(category);
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><id></red> wurde erstellt!",
-                    Placeholder.unparsed("id", category.getName())));
+                    Placeholder.unparsed("id", category.getInternalName())));
         });
         setup.register();
 
@@ -74,7 +74,7 @@ public class ShopSystemCommand extends BaseCommand {
         if (shop instanceof CategorizedShop categorizedShop) {
             categorizedShop.addCategory(category);
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Die Kategorie <red><category></red> wurde dem Shop <red><shop></red> zugewiesen!",
-                    Placeholder.parsed("category", category.getName()), Placeholder.parsed("shop", shop.getId())));
+                    Placeholder.parsed("category", category.getInternalName()), Placeholder.parsed("shop", shop.getId())));
         } else {
             sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><red>Dieser Shop unterstützt keine Kategorien!"));
         }
@@ -90,7 +90,7 @@ public class ShopSystemCommand extends BaseCommand {
                 .buyPrice(20)
                 .build());
         sender.sendMessage(shopSystem.getMiniMessage().deserialize("<prefix><gray>Das Item wurde der Kategorie <red><category></red> hinzugefügt!",
-                Placeholder.parsed("category", category.getName())));
+                Placeholder.parsed("category", category.getInternalName())));
     }
 
 

@@ -7,7 +7,6 @@ import it.einjojo.shopsystem.category.CategoryBuilder;
 import it.einjojo.shopsystem.item.ShopItem;
 import it.einjojo.shopsystem.item.ShopItemBuilder;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,8 +30,8 @@ public class CategorySetup extends AbstractSetup<Category> {
     public CategorySetup(Player player, ShopSystemPlugin plugin, CategoryBuilder categoryBuilder) {
         super(plugin, player);
         this.categoryBuilder = categoryBuilder;
-        if (categoryBuilder.getName() == null) {
-            current = Stage.NAME;
+        if (categoryBuilder.getInternalName() == null) {
+            current = Stage.INTERNAL_NAME;
         } else {
             current = Stage.ACTION_SELECT;
         }
@@ -50,7 +49,9 @@ public class CategorySetup extends AbstractSetup<Category> {
         try {
             buildResult = categoryBuilder.build();
         } catch (Exception exception) {
-            sendMessage("<red>Ein Fehler ist aufgreten: <ex>", Placeholder.unparsed("ex", exception.getMessage()));
+            String message = exception.getMessage();
+            sendMessage("<red>Ein Fehler ist aufgreten: <ex>",
+                    Placeholder.unparsed("ex", message == null ? exception.getClass().getSimpleName() : message));
             throw exception;
         }
         sendMessage("<green>Setup abgeschlossen.");
@@ -111,6 +112,21 @@ public class CategorySetup extends AbstractSetup<Category> {
     }
 
     private enum Stage implements CategorySetupStage {
+        INTERNAL_NAME {
+            @Override
+            public void prompt(CategorySetup setup) {
+                setup.sendMessage("<red>Bitte einen <b>einzigartigen internen Namen</b> der Kategorie ein");
+                setup.sendMessage("<gray>z.B 'redstone'");
+            }
+
+            @Override
+            public boolean handleChatInput(CategorySetup setup, String input) {
+                setup.categoryBuilder.internalName(input);
+                setup.confirmInput(input);
+                setup.predicateOrActionSelect(builder -> builder.getDisplayName() == null, NAME);
+                return true;
+            }
+        },
         ACTION_SELECT {
             @Override
             public void prompt(CategorySetup s) {
@@ -127,33 +143,37 @@ public class CategorySetup extends AbstractSetup<Category> {
 
             @Override
             public boolean handleChatInput(CategorySetup setup, String input) {
+                CategorySetupStage nextStage;
                 switch (input) {
                     case "1":
-                        setup.setCurrentAndPrompt(NAME);
+                        nextStage = NAME;
                         break;
                     case "2":
-                        setup.setCurrentAndPrompt(DESCRIPTION);
+                        nextStage = DESCRIPTION;
                         break;
                     case "3":
-                        setup.setCurrentAndPrompt(MATERIAL);
+                        nextStage = MATERIAL;
                         break;
                     case "4":
-                        //TODO open select gui
-                        setup.setCurrentAndPrompt(new ShopItemSetupStage(setup));
+                        nextStage = ITEM_EXISTING_ADD;
                         break;
                     case "5":
-                        setup.setCurrentAndPrompt(ITEM_REMOVE);
+                        nextStage = ITEM_REMOVE;
                         break;
                     case "6":
+                        nextStage = new ShopItemSetupStage(setup);
                         // TODO START ITEM SETUP
                         break;
                     case "0":
                         setup.complete();
-                        break;
+                        return true;
                     default:
                         setup.sendMessage("<red>Ungültige Eingabe.");
                         prompt(setup);
+                        return true;
                 }
+                setup.confirmInput(input);
+                setup.setCurrentAndPrompt(nextStage);
                 return true;
             }
         },
@@ -167,7 +187,8 @@ public class CategorySetup extends AbstractSetup<Category> {
             @Override
             public boolean handleChatInput(CategorySetup setup, String input) {
                 setup.categoryBuilder.displayName(setup.getPlugin().getMiniMessage().deserialize(input));
-                setup.predicateOrActionSelect(builder -> builder.getDescription() == null, MATERIAL);
+                setup.confirmInput(input);
+                setup.predicateOrActionSelect(builder -> builder.getDescription() == null || builder.getDescription().isEmpty(), DESCRIPTION);
                 return true;
             }
         },
@@ -181,6 +202,7 @@ public class CategorySetup extends AbstractSetup<Category> {
             @Override
             public boolean handleChatInput(CategorySetup setup, String input) {
                 setup.categoryBuilder.description(input);
+                setup.confirmInput(input);
                 setup.predicateOrActionSelect(builder -> builder.getDisplayMaterial() == null, MATERIAL);
                 return true;
             }
@@ -194,6 +216,7 @@ public class CategorySetup extends AbstractSetup<Category> {
             @Override
             public boolean handleItemDrop(CategorySetup setup, ItemStack dropped) {
                 setup.categoryBuilder.displayMaterial(dropped.getType());
+                setup.confirmInput(dropped.getType().name());
                 setup.setCurrentAndPrompt(ACTION_SELECT);
                 return true;
             }
@@ -226,9 +249,10 @@ public class CategorySetup extends AbstractSetup<Category> {
                         setup.sendMessage("<red>Ungültiger Wertebereich. Versuche es nochmal!");
                         return true;
                     }
-                    items.remove(index);
+                    ShopItem removed = items.remove(index);
+                    setup.categoryBuilder.setItemList(items);
                     setup.sendMessage("<gray>Das <hover:show_text:'<gray><item-string></gray>'>Item</hover> <red><index></red> wurde entfernt",
-                            Placeholder.unparsed("item-string", ""),
+                            Placeholder.unparsed("item-string", removed.toString()),
                             Placeholder.unparsed("index", String.valueOf(index + 1)));
                     setup.setCurrentAndPrompt(Stage.ACTION_SELECT);
                 } catch (NumberFormatException ex) {
