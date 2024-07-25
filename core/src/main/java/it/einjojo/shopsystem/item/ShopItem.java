@@ -1,5 +1,6 @@
 package it.einjojo.shopsystem.item;
 
+import com.google.common.base.Preconditions;
 import it.einjojo.shopsystem.ShopSystemPlugin;
 import it.einjojo.shopsystem.events.PlayerConditionFailEvent;
 import it.einjojo.shopsystem.events.PlayerShopSellEvent;
@@ -40,7 +41,15 @@ public class ShopItem {
     @Nullable
     private Integer stock;
 
-    public ShopItem(@NotNull TradeHandler tradeHandler, @NotNull ItemStack displayItemBase, @Nullable Integer buyPrice, @Nullable Integer sellPrice, @Nullable Integer stock, @NotNull Collection<ConditionChecker> conditionChecks) {
+    public ShopItem(@NotNull TradeHandler tradeHandler,
+                    @NotNull ItemStack displayItemBase,
+                    @Nullable Integer buyPrice,
+                    @Nullable Integer sellPrice,
+                    @Nullable Integer stock,
+                    @NotNull Collection<ConditionChecker> conditionChecks) {
+        Preconditions.checkNotNull(tradeHandler);
+        Preconditions.checkNotNull(displayItemBase);
+        Preconditions.checkNotNull(conditionChecks);
         this.tradeHandler = tradeHandler;
         this.displayItemBase = displayItemBase;
         this.buyPrice = buyPrice;

@@ -32,7 +32,12 @@ public class ItemStackTradeHandler implements TradeHandler {
             }
             ;
         } catch (Exception ex) {
+            if (ex instanceof ItemTradeException) throw ex;
             throw new ItemTradeException(ex);
         }
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack.clone();
     }
 }

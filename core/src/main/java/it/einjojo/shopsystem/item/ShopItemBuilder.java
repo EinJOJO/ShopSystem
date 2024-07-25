@@ -7,6 +7,7 @@ import it.einjojo.shopsystem.item.handler.TradeHandler;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,12 +19,12 @@ import java.util.List;
 public class ShopItemBuilder {
     private static final ItemStack NO_DISPLAY_ITEM = new ItemStack(Material.PAPER);
     private final List<ConditionChecker> conditionCheckerList = new LinkedList<>();
-    private TradeHandler tradeHandler;
     private ItemStack displayItem = NO_DISPLAY_ITEM;
-    private Integer buyPrice;
-    private Integer sellPrice;
-    private Integer stock;
-    private ShopItemObserver observer;
+    private @Nullable TradeHandler tradeHandler;
+    private @Nullable Integer buyPrice;
+    private @Nullable Integer sellPrice;
+    private @Nullable Integer stock;
+    private @Nullable ShopItemObserver observer;
 
     public ShopItemBuilder() {
     }
@@ -46,8 +47,9 @@ public class ShopItemBuilder {
     /**
      * Sets item trade handler and display icon to the item
      *
+     * @param itemStack should not be air or null.
      * @return this builder
-     * @params itemsStack should not be air or null.
+     * @throws IllegalArgumentException if itemStack is air
      */
     public ShopItemBuilder withItemStack(@NotNull ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack);
@@ -58,6 +60,10 @@ public class ShopItemBuilder {
         itemTradeHandler(new ItemStackTradeHandler(itemStack));
         displayItem(itemStack);
         return this;
+    }
+
+    public ShopItemBuilder displayItem(Material material) {
+        return displayItem(new ItemStack(material));
     }
 
 
@@ -76,7 +82,7 @@ public class ShopItemBuilder {
         return this;
     }
 
-    public ShopItemBuilder displayItem(ItemStack displayItem) {
+    public ShopItemBuilder displayItem(@NotNull ItemStack displayItem) {
         this.displayItem = displayItem;
         return this;
     }
@@ -101,7 +107,7 @@ public class ShopItemBuilder {
         return conditionCheckerList;
     }
 
-    public TradeHandler getTradeHandler() {
+    public @Nullable TradeHandler getTradeHandler() {
         return tradeHandler;
     }
 
@@ -109,23 +115,35 @@ public class ShopItemBuilder {
         return displayItem;
     }
 
-    public Integer getBuyPrice() {
+    public @Nullable Integer getBuyPrice() {
         return buyPrice;
     }
 
-    public Integer getSellPrice() {
+    public @Nullable Integer getSellPrice() {
         return sellPrice;
     }
 
-    public Integer getStock() {
+    public @Nullable Integer getStock() {
         return stock;
     }
 
-    public ShopItemObserver getObserver() {
+    public @Nullable ShopItemObserver getObserver() {
         return observer;
     }
 
+
+    public boolean isBuyableOrSellable() {
+        return buyPrice != null || sellPrice != null;
+    }
+
+
     public ShopItem build() {
+        if (tradeHandler == null) {
+            throw new IllegalStateException("TradeHandler must be set");
+        }
+        if (displayItem == null) {
+            throw new IllegalStateException("DisplayItem must be set");
+        }
         var shopItem = new ShopItem(tradeHandler, displayItem, buyPrice, sellPrice, stock, conditionCheckerList);
         shopItem.setObserver(observer);
         return shopItem;

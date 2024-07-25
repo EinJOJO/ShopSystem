@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.obliviateinvcore)
     implementation(libs.obliviateinvpagination)
     implementation(libs.acf)
+    implementation(libs.nbtapi)
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
@@ -73,6 +74,7 @@ tasks {
         archiveClassifier.set("")
         relocate("mc.obliviate.inventory", "it.einjojo.shopsystem.shadow.inventory")
         relocate("co.aikar", "it.einjojo.shopsystem.shadow.aikar")
+        relocate("de.tr7zw.changeme.nbtapi", "it.einjojo.shopsystem.shadow.nbtapi")
         minimize()
 
 
