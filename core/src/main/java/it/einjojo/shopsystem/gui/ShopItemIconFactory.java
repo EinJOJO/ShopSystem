@@ -92,10 +92,10 @@ public interface ShopItemIconFactory {
 
     class Default implements ShopItemIconFactory {
         @Override
-        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin) {
+        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin, int amount) {
             return new Icon(shopItem.getDisplayItem().clone()).onClick((clickEvent) -> {
                 try {
-                    shopItem.buy((Player) clickEvent.getWhoClicked(), plugin, 1);
+                    shopItem.buy((Player) clickEvent.getWhoClicked(), plugin, amount);
                 } catch (ItemTradeException e) {
                     throw new RuntimeException(e);
                 }
