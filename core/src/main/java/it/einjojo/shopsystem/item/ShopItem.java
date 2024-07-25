@@ -190,6 +190,7 @@ public class ShopItem {
             return false;
         }
         amount = buyEvent.getAmount();
+        final int buyPrice = this.buyPrice * amount;
         ConditionChecker failed = checkBuyCondition(buyer, amount);
         if (failed != null) {
             Component component = plugin.getMiniMessage().deserialize(failed.getBuyFailureText(buyer, this, amount), getTagResolvers());
@@ -201,11 +202,16 @@ public class ShopItem {
             }
             return false;
         }
-        getItemTradeHandler().giveItem(buyer, amount);
-        if (!plugin.getEconomyHandler().has(buyer.getUniqueId(), buyPrice * amount)) {
+        if (!plugin.getEconomyHandler().has(buyer.getUniqueId(), buyPrice)) {
             throw new ItemTradeException(ItemTradeException.Reason.INSUFFICIENT_FUNDS);
         }
-        plugin.getEconomyHandler().remove(buyer.getUniqueId(), buyPrice * amount);
+        plugin.getEconomyHandler().remove(buyer.getUniqueId(), buyPrice);
+        try {
+            getItemTradeHandler().giveItem(buyer, amount);
+        } catch (ItemTradeException e) {
+            plugin.getEconomyHandler().add(buyer.getUniqueId(), buyPrice);
+            throw e;
+        }
         if (stock != null) {
             setStock(stock - amount);
         }
@@ -219,7 +225,7 @@ public class ShopItem {
      * @param plugin ShopSystemPlugin
      * @param amount Amount of items to sell
      * @return true if the item was sold successfully and false if the item could not be sold. e.g failed condition checks or cancelled event
-     * @throws ItemTradeException if the item could not be sold because of weird reasons {@link ItemTradeException.Reason}
+     * @throws ItemTradeException    if the item could not be sold because of weird reasons {@link ItemTradeException.Reason}
      * @throws IllegalStateException if the method is not called from the main thread
      */
     public boolean sell(Player player, ShopSystemPlugin plugin, int amount) throws ItemTradeException {

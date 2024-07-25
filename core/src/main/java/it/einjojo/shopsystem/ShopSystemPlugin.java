@@ -130,6 +130,7 @@ public class ShopSystemPlugin extends JavaPlugin {
         commandSender.sendMessage(getMiniMessage().deserialize(miniMessage, resolvers));
     }
 
+
     @NotNull
     public ShopSystemPluginConfig getShopConfig() {
         return config;
