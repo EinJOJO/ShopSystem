@@ -12,7 +12,7 @@ public class AmountManager {
     private final Gui gui;
     private Material iconMaterial = Material.CHEST_MINECART;
     private int[] amountStages = new int[]{1, 8, 16, 32, 64};
-    private int baseSlot = 9 * 5 + 1;
+    private int baseSlot = 9 * 5 + 2;
     private Consumer<Integer> onAmountChange;
     private int amount = amountStages[0];
 
@@ -23,7 +23,7 @@ public class AmountManager {
     public void update() {
         for (int i = 0; i < amountStages.length; i++) {
             int amountStage = amountStages[i];
-            Icon icon = new Icon(iconMaterial);
+            Icon icon = new Icon(iconMaterial).setAmount(amountStage);
             if (amountStage == amount) {
                 icon.setName("§d" + amountStage);
                 icon.enchant(Enchantment.ARROW_DAMAGE);
