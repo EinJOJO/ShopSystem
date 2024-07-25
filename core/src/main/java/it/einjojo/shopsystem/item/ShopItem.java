@@ -174,8 +174,8 @@ public class ShopItem {
      * @param buyer  Player who wants to buy the item
      * @param plugin ShopSystemPlugin
      * @param amount Amount of items to buy
-     * @return true if the item was bought successfully
-     * @throws ItemTradeException    if the item could not be bought because of weird reasons
+     * @return true if the item was bought successfully and false if the item could not be bought. e.g failed condition checks or cancelled event
+     * @throws ItemTradeException    if the item could not be bought because of weird reasons ({@link ItemTradeException.Reason})
      * @throws IllegalStateException if the method is not called from the main thread
      */
     public boolean buy(Player buyer, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
@@ -212,6 +212,16 @@ public class ShopItem {
         return true;
     }
 
+    /**
+     * Sell the item
+     *
+     * @param player Player who wants to sell the item
+     * @param plugin ShopSystemPlugin
+     * @param amount Amount of items to sell
+     * @return true if the item was sold successfully and false if the item could not be sold. e.g failed condition checks or cancelled event
+     * @throws ItemTradeException if the item could not be sold because of weird reasons {@link ItemTradeException.Reason}
+     * @throws IllegalStateException if the method is not called from the main thread
+     */
     public boolean sell(Player player, ShopSystemPlugin plugin, int amount) throws ItemTradeException {
         if (!Bukkit.isPrimaryThread()) {
             throw new IllegalStateException("sell() must be called from the main thread");
