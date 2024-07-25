@@ -44,7 +44,7 @@ public interface ShopItemIconFactory {
                             );
                         } catch (ItemTradeException e) {
                             playActionSound(false, player);
-                            player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Kauf konnte nicht durchgeührt werden: <reason>",
+                            player.sendMessage(plugin.getMiniMessage().deserialize("<prefix><red>Verkauf konnte nicht durchgeührt werden: <reason>",
                                     Placeholder.unparsed("reason", e.getReason().name())));
                             ShopItemIconFactory.handleTradeException(e);
                         }

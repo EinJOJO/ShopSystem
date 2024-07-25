@@ -1,6 +1,8 @@
 package it.einjojo.shopsystem.item;
 
 import it.einjojo.shopsystem.ShopSystemPlugin;
+import it.einjojo.shopsystem.events.PlayerConditionFailEvent;
+import it.einjojo.shopsystem.events.PlayerShopSellEvent;
 import it.einjojo.shopsystem.item.condition.ConditionChecker;
 import it.einjojo.shopsystem.item.handler.TradeHandler;
 import it.einjojo.shopsystem.util.Messages;
@@ -183,13 +185,26 @@ public class ShopItem {
         if (buyPrice == null) {
             throw new ItemTradeException(ItemTradeException.Reason.ARTICLE_NOT_BUYABLE);
         }
+        var buyEvent = new PlayerShopSellEvent(buyer, this, amount);
+        if (!buyEvent.callEvent()) {
+            return false;
+        }
+        amount = buyEvent.getAmount();
         ConditionChecker failed = checkBuyCondition(buyer, amount);
         if (failed != null) {
             Component component = plugin.getMiniMessage().deserialize(failed.getBuyFailureText(buyer, this, amount), getTagResolvers());
-            buyer.sendMessage(component);
+            var event = new PlayerConditionFailEvent(buyer, PlayerConditionFailEvent.Action.BUY, this, failed, component);
+            event.callEvent();
+            Component failMessage = event.getFailMessage();
+            if (failMessage != null) {
+                buyer.sendMessage(failMessage);
+            }
             return false;
         }
         getItemTradeHandler().giveItem(buyer, amount);
+        if (!plugin.getEconomyHandler().has(buyer.getUniqueId(), buyPrice * amount)) {
+            throw new ItemTradeException(ItemTradeException.Reason.INSUFFICIENT_FUNDS);
+        }
         plugin.getEconomyHandler().remove(buyer.getUniqueId(), buyPrice * amount);
         if (stock != null) {
             setStock(stock - amount);
@@ -204,10 +219,20 @@ public class ShopItem {
         if (sellPrice == null) {
             throw new ItemTradeException(ItemTradeException.Reason.ARTICLE_NOT_SELLABLE);
         }
+        var sellEvent = new PlayerShopSellEvent(player, this, amount);
+        if (!sellEvent.callEvent()) {
+            return false;
+        }
+        amount = sellEvent.getAmount();
         ConditionChecker failed = checkSellCondition(player, amount);
         if (failed != null) {
             Component component = plugin.getMiniMessage().deserialize(failed.getSellFailureText(player, this, amount), getTagResolvers());
-            player.sendMessage(component);
+            var event = new PlayerConditionFailEvent(player, PlayerConditionFailEvent.Action.SELL, this, failed, component);
+            event.callEvent();
+            Component failMessage = event.getFailMessage();
+            if (failMessage != null) {
+                player.sendMessage(failMessage);
+            }
             return false;
         }
         getItemTradeHandler().removeItem(player, amount);

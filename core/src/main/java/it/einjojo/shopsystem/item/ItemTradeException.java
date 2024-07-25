@@ -6,11 +6,6 @@ package it.einjojo.shopsystem.item;
 public class ItemTradeException extends Exception {
     private final Reason reason;
 
-    @Deprecated
-    public ItemTradeException(String reason) {
-        super(reason);
-        this.reason = Reason.UNKNOWN;
-    }
 
     public ItemTradeException(Reason reason) {
         super(reason.name());
@@ -34,7 +29,8 @@ public class ItemTradeException extends Exception {
         ARTICLE_NOT_BUYABLE,
         ITEM_REMOVAL_FAILED,
         EXCEPTION,
-        UNKNOWN
+        UNKNOWN,
+        INSUFFICIENT_FUNDS
 
     }
 
