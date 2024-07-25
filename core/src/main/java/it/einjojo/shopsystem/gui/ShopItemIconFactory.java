@@ -5,6 +5,7 @@ import it.einjojo.shopsystem.item.ShopItem;
 import it.einjojo.shopsystem.item.ItemTradeException;
 import mc.obliviate.inventory.Icon;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -21,19 +22,24 @@ public interface ShopItemIconFactory {
      * @return the icon for the shop item or null if no icon was created.
      */
     @Nullable
-    Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin);
+    Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin, int amount);
 
     class SellOnly implements ShopItemIconFactory {
 
         @Override
-        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin) {
+        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin, int amount) {
+            Integer sellPrice = shopItem.getSellPrice();
+            if (sellPrice == null) {
+                return null; // Not sellable
+            }
             return new Icon(shopItem.getDisplayItemBase().clone())
-                    .setLore("", "Verkaufen für " + shopItem.getSellPrice() + " Coins")
+                    .setLore("", "Verkaufen für " + shopItem.getSellPrice() * amount + " Coins")
+                    .setAmount(amount)
                     .onClick((clickEvent) -> {
                         Player player = (Player) clickEvent.getWhoClicked();
                         try {
                             playActionSound(
-                                    shopItem.sell(player, plugin, 1),
+                                    shopItem.sell(player, plugin, amount),
                                     player
                             );
                         } catch (ItemTradeException e) {
@@ -53,18 +59,20 @@ public interface ShopItemIconFactory {
     }
 
 
-
     class BuyOnly implements ShopItemIconFactory {
 
         @Override
-        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin) {
+        public @Nullable Icon createIcon(ShopItem shopItem, ShopSystemPlugin plugin, int amount) {
+            Integer buyPrice = shopItem.getBuyPrice();
+            if (buyPrice == null) return null;
             return new Icon(shopItem.getDisplayItemBase().clone())
-                    .setLore("", "Kaufen für " + shopItem.getBuyPrice() + " Coins")
+                    .setLore("", "Kaufen für " + buyPrice * amount + " Coins")
+                    .setAmount(amount)
                     .onClick((clickEvent) -> {
                         Player player = (Player) clickEvent.getWhoClicked();
                         try {
                             playActionSound(
-                                    shopItem.buy(player, plugin, 1),
+                                    shopItem.buy(player, plugin, amount),
                                     player
                             );
                         } catch (ItemTradeException e) {

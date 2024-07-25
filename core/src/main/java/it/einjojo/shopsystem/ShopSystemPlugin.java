@@ -15,6 +15,7 @@ import mc.obliviate.inventory.InventoryAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -123,6 +124,10 @@ public class ShopSystemPlugin extends JavaPlugin {
 
     public EconomyHandler getEconomyHandler() {
         return economyHandler;
+    }
+
+    public void sendMessage(CommandSender commandSender, String miniMessage, TagResolver... resolvers) {
+        commandSender.sendMessage(getMiniMessage().deserialize(miniMessage, resolvers));
     }
 
     @NotNull

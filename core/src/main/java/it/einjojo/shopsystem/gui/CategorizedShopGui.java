@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class CategorizedShopGui extends ShopSystemGui {
     private static final Icon BACKGROUND = new Icon(Material.BLACK_STAINED_GLASS_PANE).setName("§7");
     private final PaginationManager itemsPagination = new PaginationManager(this);
+    private final AmountManager amountManager = new AmountManager(this);
     private final PaginationManager categoriesPagination = new PaginationManager(this);
     private final CategorizedShop shop;
     private final ShopItemIconFactory shopItemIconFactory;
@@ -71,6 +72,10 @@ public class CategorizedShopGui extends ShopSystemGui {
     public void onOpen(InventoryOpenEvent event) {
         fillGui(BACKGROUND);
         addPageSwitcher();
+        amountManager.setOnAmountChange((newAmount) -> {
+            renderItems();
+        });
+        amountManager.update();
         renderItems();
         renderCategories();
     }
@@ -78,7 +83,7 @@ public class CategorizedShopGui extends ShopSystemGui {
     public void renderItems() {
         itemsPagination.getItems().clear();
         for (ShopItem shopItem : selectedCategory) {
-            var icon = shopItemIconFactory.createIcon(shopItem, plugin);
+            var icon = shopItemIconFactory.createIcon(shopItem, plugin, amountManager.getAmount());
             if (icon != null) {
                 itemsPagination.addItem(icon);
             }

@@ -13,6 +13,15 @@ public class CategoryManager {
         return categories;
     }
 
+    public Category getCategoryByInternalName(String internalName) {
+        return categories.get(internalName);
+    }
+
+    /**
+     * Register a category. If a category with the same internal name already exists, it will be replaced / it will be handled like an update.
+     *
+     * @param category The category to register
+     */
     public void registerCategory(Category category) {
         Category replaced = categories.put(category.getInternalName(), category);
         if (replaced != null) {
